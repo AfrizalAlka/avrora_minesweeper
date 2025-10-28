@@ -12,10 +12,238 @@ class Minesweeper {
         this.timerInterval = null;
         this.currentLevel = 'easy';
 
+        // Sound settings
+        this.soundEnabled = this.loadSetting('soundEnabled', true);
+
+        // Dark mode
+        this.darkMode = this.loadSetting('darkMode', false);
+
+        // Leaderboard
+        this.leaderboard = this.loadLeaderboard();
+
         // Load best scores from localStorage
         this.bestScores = this.loadBestScores();
 
+        // Initialize sounds
+        this.initSounds();
+
         this.init();
+    }
+
+    initSounds() {
+        // Create audio context for sound effects
+        this.sounds = {
+            click: this.createBeep(800, 0.1, 'sine'),
+            flag: this.createBeep(600, 0.1, 'square'),
+            reveal: this.createBeep(400, 0.15, 'triangle'),
+            win: this.createBeep(1000, 0.3, 'sine'),
+            lose: this.createBeep(200, 0.5, 'sawtooth')
+        };
+    }
+
+    createBeep(frequency, duration, type = 'sine') {
+        return () => {
+            if (!this.soundEnabled) return;
+
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        };
+    }
+
+    playSound(soundName) {
+        if (this.sounds[soundName]) {
+            this.sounds[soundName]();
+        }
+    }
+
+    loadSetting(key, defaultValue) {
+        const saved = localStorage.getItem(`minesweeper-${key}`);
+        return saved !== null ? JSON.parse(saved) : defaultValue;
+    }
+
+    saveSetting(key, value) {
+        localStorage.setItem(`minesweeper-${key}`, JSON.stringify(value));
+    }
+
+    loadLeaderboard() {
+        const saved = localStorage.getItem('minesweeper-leaderboard');
+        return saved ? JSON.parse(saved) : {
+            easy: [],
+            medium: [],
+            hard: []
+        };
+    }
+
+    saveLeaderboard() {
+        localStorage.setItem('minesweeper-leaderboard', JSON.stringify(this.leaderboard));
+    }
+
+    addToLeaderboard(level, time) {
+        if (!this.leaderboard[level]) {
+            this.leaderboard[level] = [];
+        }
+
+        const entry = {
+            time: time,
+            date: new Date().toLocaleDateString('id-ID'),
+            timestamp: Date.now()
+        };
+
+        this.leaderboard[level].push(entry);
+        this.leaderboard[level].sort((a, b) => a.time - b.time);
+        this.leaderboard[level] = this.leaderboard[level].slice(0, 10); // Keep top 10
+
+        this.saveLeaderboard();
+    }
+
+    saveGame() {
+        if (!this.gameStarted || this.gameOver) {
+            alert('Tidak ada game aktif untuk disimpan!');
+            return;
+        }
+
+        const gameState = {
+            board: this.board,
+            rows: this.rows,
+            cols: this.cols,
+            minesCount: this.minesCount,
+            flagsCount: this.flagsCount,
+            revealedCount: this.revealedCount,
+            timer: this.timer,
+            currentLevel: this.currentLevel,
+            timestamp: Date.now()
+        };
+
+        localStorage.setItem('minesweeper-saved-game', JSON.stringify(gameState));
+        alert('✅ Game berhasil disimpan!');
+        this.playSound('flag');
+    }
+
+    loadGame() {
+        const saved = localStorage.getItem('minesweeper-saved-game');
+        if (!saved) {
+            alert('Tidak ada game tersimpan!');
+            return;
+        }
+
+        const gameState = JSON.parse(saved);
+
+        // Restore game state
+        this.board = gameState.board;
+        this.rows = gameState.rows;
+        this.cols = gameState.cols;
+        this.minesCount = gameState.minesCount;
+        this.flagsCount = gameState.flagsCount;
+        this.revealedCount = gameState.revealedCount;
+        this.timer = gameState.timer;
+        this.currentLevel = gameState.currentLevel;
+        this.gameStarted = true;
+        this.gameOver = false;
+
+        // Re-render board
+        this.renderBoard();
+        this.restoreBoardState();
+
+        // Restart timer
+        this.startTimer();
+
+        // Update UI
+        this.updateMinesCount();
+        this.updateFlagsCount();
+        this.updateTimer();
+        this.displayBestScore();
+
+        alert('✅ Game berhasil dimuat!');
+        this.playSound('reveal');
+    }
+
+    restoreBoardState() {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                const cell = this.board[i][j];
+                const cellElement = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+
+                if (cell.revealed) {
+                    cellElement.classList.add('revealed');
+                    if (cell.mine) {
+                        cellElement.classList.add('mine');
+                        cellElement.textContent = '💣';
+                    } else if (cell.adjacentMines > 0) {
+                        cellElement.textContent = cell.adjacentMines;
+                        cellElement.classList.add(`number-${cell.adjacentMines}`);
+                    }
+                }
+
+                if (cell.flagged) {
+                    cellElement.classList.add('flagged');
+                    cellElement.textContent = '🚩';
+                }
+            }
+        }
+    }
+
+    toggleDarkMode() {
+        this.darkMode = !this.darkMode;
+        document.body.classList.toggle('dark-mode', this.darkMode);
+        this.saveSetting('darkMode', this.darkMode);
+        this.playSound('click');
+    }
+
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        this.saveSetting('soundEnabled', this.soundEnabled);
+
+        const soundBtn = document.getElementById('sound-toggle');
+        soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+
+        if (this.soundEnabled) {
+            this.playSound('click');
+        }
+    }
+
+    showLeaderboard() {
+        const modal = document.getElementById('leaderboard-modal');
+        modal.classList.add('show');
+        this.displayLeaderboardTab('easy');
+        this.playSound('click');
+    }
+
+    displayLeaderboardTab(level) {
+        const content = document.getElementById('leaderboard-content');
+        const entries = this.leaderboard[level] || [];
+
+        if (entries.length === 0) {
+            content.innerHTML = '<p style="text-align: center; color: #999;">Belum ada data</p>';
+            return;
+        }
+
+        content.innerHTML = entries.map((entry, index) => {
+            const rankClass = index < 3 ? `rank-${index + 1}` : '';
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+
+            return `
+                <div class="leaderboard-item ${rankClass}">
+                    <div class="leaderboard-rank">${medal}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-date">${entry.date}</div>
+                    </div>
+                    <div class="leaderboard-time">${entry.time}s</div>
+                </div>
+            `;
+        }).join('');
     }
 
     loadBestScores() {
@@ -49,10 +277,51 @@ class Minesweeper {
     init() {
         this.setupEventListeners();
         this.createBoard();
+
+        // Apply dark mode if enabled
+        if (this.darkMode) {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Update sound button
+        const soundBtn = document.getElementById('sound-toggle');
+        if (soundBtn) {
+            soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+        }
     }
 
     setupEventListeners() {
         document.getElementById('new-game').addEventListener('click', () => this.resetGame());
+
+        // Header controls
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => this.toggleDarkMode());
+        document.getElementById('sound-toggle').addEventListener('click', () => this.toggleSound());
+        document.getElementById('save-game').addEventListener('click', () => this.saveGame());
+        document.getElementById('load-game').addEventListener('click', () => this.loadGame());
+        document.getElementById('show-leaderboard').addEventListener('click', () => this.showLeaderboard());
+
+        // Leaderboard modal
+        document.getElementById('close-leaderboard').addEventListener('click', () => {
+            document.getElementById('leaderboard-modal').classList.remove('show');
+            this.playSound('click');
+        });
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.displayLeaderboardTab(e.target.dataset.tab);
+                this.playSound('click');
+            });
+        });
+
+        // Close modal on outside click
+        document.getElementById('leaderboard-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'leaderboard-modal') {
+                e.target.classList.remove('show');
+                this.playSound('click');
+            }
+        });
 
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -204,6 +473,8 @@ class Minesweeper {
             return;
         }
 
+        this.playSound('click');
+
         if (!this.gameStarted) {
             this.gameStarted = true;
             this.placeMines(row, col);
@@ -233,8 +504,10 @@ class Minesweeper {
             cellElement.classList.add('mine');
             cellElement.textContent = '💣';
             this.gameOver = true;
+            this.playSound('lose');
             this.endGame(false);
         } else {
+            this.playSound('reveal');
             if (cell.adjacentMines > 0) {
                 cellElement.textContent = cell.adjacentMines;
                 cellElement.classList.add(`number-${cell.adjacentMines}`);
@@ -255,6 +528,8 @@ class Minesweeper {
         if (this.gameOver || this.board[row][col].revealed) {
             return;
         }
+
+        this.playSound('flag');
 
         const cell = this.board[row][col];
         const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
@@ -289,7 +564,14 @@ class Minesweeper {
         const statusMessage = document.getElementById('status-message');
 
         if (won) {
+            this.playSound('win');
             this.updateBestScore();
+
+            // Add to leaderboard for preset difficulties
+            if (['easy', 'medium', 'hard'].includes(this.currentLevel)) {
+                this.addToLeaderboard(this.currentLevel, this.timer);
+            }
+
             const bestScore = this.bestScores[this.currentLevel];
             let message = `🎉 Selamat! Anda Menang! Waktu: ${this.timer} detik`;
 
