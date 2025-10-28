@@ -32,8 +32,9 @@ h1 {
 }
 
 .game-info {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
     margin-bottom: 20px;
     background: #f8f9fa;
     padding: 15px;
@@ -54,7 +55,8 @@ h1 {
 
 #mines-count,
 #flags-count,
-#timer {
+#timer,
+#best-score {
     font-size: 1.5em;
     font-weight: bold;
     color: #667eea;
@@ -87,6 +89,61 @@ h1 {
 .difficulty-btn.active {
     background: #667eea;
     color: white;
+}
+
+.custom-settings {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.custom-input-group {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.custom-input-group label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.custom-input-group input {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    font-size: 1em;
+    width: 80px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.custom-input-group input:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.apply-custom-btn {
+    padding: 8px 20px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.apply-custom-btn:hover {
+    background: #764ba2;
+    transform: scale(1.05);
 }
 
 .new-game-btn {

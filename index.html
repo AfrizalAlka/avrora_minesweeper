@@ -25,12 +25,36 @@
                 <span class="label">⏱️ Time:</span>
                 <span id="timer">0</span>
             </div>
+            <div class="info-item">
+                <span class="label">🏆 Best:</span>
+                <span id="best-score">-</span>
+            </div>
         </div>
 
         <div class="difficulty">
             <button class="difficulty-btn active" data-level="easy">Mudah (8x8)</button>
             <button class="difficulty-btn" data-level="medium">Sedang (12x12)</button>
             <button class="difficulty-btn" data-level="hard">Sulit (16x16)</button>
+            <button class="difficulty-btn" data-level="custom">Custom</button>
+        </div>
+
+        <!-- Custom Grid Settings -->
+        <div class="custom-settings" id="custom-settings" style="display: none;">
+            <div class="custom-input-group">
+                <label>
+                    <span>Baris:</span>
+                    <input type="number" id="custom-rows" min="5" max="30" value="10">
+                </label>
+                <label>
+                    <span>Kolom:</span>
+                    <input type="number" id="custom-cols" min="5" max="30" value="10">
+                </label>
+                <label>
+                    <span>Bom:</span>
+                    <input type="number" id="custom-mines" min="1" max="200" value="15">
+                </label>
+                <button class="apply-custom-btn" id="apply-custom">Terapkan</button>
+            </div>
         </div>
 
         <button class="new-game-btn" id="new-game">🎲 Game Baru</button>
