@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 700px;
+    width: 100%;
+}
+
+h1 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.label {
+    font-size: 0.9em;
+    color: #666;
+}
+
+#mines-count,
+#flags-count,
+#timer {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.difficulty {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.difficulty-btn {
+    padding: 10px 20px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.difficulty-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.difficulty-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.new-game-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.new-game-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.game-board {
+    display: grid;
+    gap: 2px;
+    background: #ddd;
+    padding: 2px;
+    border-radius: 10px;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.cell {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(145deg, #e0e0e0, #ffffff);
+    border: 2px solid #bbb;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.cell:hover:not(.revealed):not(.flagged) {
+    background: #f0f0f0;
+    transform: scale(1.05);
+}
+
+.cell.revealed {
+    background: #fff;
+    border-color: #ddd;
+    cursor: default;
+}
+
+.cell.mine {
+    background: #ff4757;
+    color: white;
+}
+
+.cell.flagged {
+    background: #ffa502;
+    color: white;
+}
+
+.cell.number-1 {
+    color: #0000ff;
+}
+
+.cell.number-2 {
+    color: #008000;
+}
+
+.cell.number-3 {
+    color: #ff0000;
+}
+
+.cell.number-4 {
+    color: #000080;
+}
+
+.cell.number-5 {
+    color: #800000;
+}
+
+.cell.number-6 {
+    color: #008080;
+}
+
+.cell.number-7 {
+    color: #000000;
+}
+
+.cell.number-8 {
+    color: #808080;
+}
+
+.status-message {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: none;
+}
+
+.status-message.show {
+    display: block;
+}
+
+.status-message.win {
+    background: #2ecc71;
+    color: white;
+}
+
+.status-message.lose {
+    background: #e74c3c;
+    color: white;
+}
+
+@media (max-width: 600px) {
+    .cell {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9em;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .difficulty {
+        flex-direction: column;
+    }
+
+    .container {
+        padding: 15px;
+    }
+}

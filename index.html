@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avrora Minesweeper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>AVRORA MINESWEEPER</h1>
+
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">💣 Mines:</span>
+                <span id="mines-count">10</span>
+            </div>
+            <div class="info-item">
+                <span class="label">🚩 Flags:</span>
+                <span id="flags-count">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">⏱️ Time:</span>
+                <span id="timer">0</span>
+            </div>
+        </div>
+
+        <div class="difficulty">
+            <button class="difficulty-btn active" data-level="easy">Mudah (8x8)</button>
+            <button class="difficulty-btn" data-level="medium">Sedang (12x12)</button>
+            <button class="difficulty-btn" data-level="hard">Sulit (16x16)</button>
+        </div>
+
+        <button class="new-game-btn" id="new-game">🎲 Game Baru</button>
+
+        <div id="game-board" class="game-board"></div>
+
+        <div class="status-message" id="status-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
