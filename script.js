@@ -10,8 +10,40 @@ class Minesweeper {
         this.gameStarted = false;
         this.timer = 0;
         this.timerInterval = null;
+        this.currentLevel = 'easy';
+
+        // Load best scores from localStorage
+        this.bestScores = this.loadBestScores();
 
         this.init();
+    }
+
+    loadBestScores() {
+        const saved = localStorage.getItem('minesweeper-best-scores');
+        return saved ? JSON.parse(saved) : {
+            easy: null,
+            medium: null,
+            hard: null,
+            custom: null
+        };
+    }
+
+    saveBestScores() {
+        localStorage.setItem('minesweeper-best-scores', JSON.stringify(this.bestScores));
+    }
+
+    updateBestScore() {
+        const currentBest = this.bestScores[this.currentLevel];
+        if (currentBest === null || this.timer < currentBest) {
+            this.bestScores[this.currentLevel] = this.timer;
+            this.saveBestScores();
+        }
+        this.displayBestScore();
+    }
+
+    displayBestScore() {
+        const bestScore = this.bestScores[this.currentLevel];
+        document.getElementById('best-score').textContent = bestScore !== null ? `${bestScore}s` : '-';
     }
 
     init() {
@@ -28,25 +60,60 @@ class Minesweeper {
                 e.target.classList.add('active');
 
                 const level = e.target.dataset.level;
+                this.currentLevel = level;
+
+                const customSettings = document.getElementById('custom-settings');
+
                 switch (level) {
                     case 'easy':
                         this.rows = 8;
                         this.cols = 8;
                         this.minesCount = 10;
+                        customSettings.style.display = 'none';
                         break;
                     case 'medium':
                         this.rows = 12;
                         this.cols = 12;
                         this.minesCount = 20;
+                        customSettings.style.display = 'none';
                         break;
                     case 'hard':
                         this.rows = 16;
                         this.cols = 16;
                         this.minesCount = 40;
+                        customSettings.style.display = 'none';
                         break;
+                    case 'custom':
+                        customSettings.style.display = 'block';
+                        return; // Don't reset game yet, wait for custom input
                 }
                 this.resetGame();
             });
+        });
+
+        // Custom settings
+        document.getElementById('apply-custom').addEventListener('click', () => {
+            const rows = parseInt(document.getElementById('custom-rows').value);
+            const cols = parseInt(document.getElementById('custom-cols').value);
+            const mines = parseInt(document.getElementById('custom-mines').value);
+
+            // Validation
+            if (rows < 5 || rows > 30 || cols < 5 || cols > 30) {
+                alert('Ukuran grid harus antara 5 dan 30!');
+                return;
+            }
+
+            const maxMines = Math.floor((rows * cols) * 0.8); // Max 80% of cells
+            if (mines < 1 || mines > maxMines) {
+                alert(`Jumlah bom harus antara 1 dan ${maxMines}!`);
+                return;
+            }
+
+            this.rows = rows;
+            this.cols = cols;
+            this.minesCount = mines;
+            this.currentLevel = 'custom';
+            this.resetGame();
         });
     }
 
@@ -68,6 +135,7 @@ class Minesweeper {
         this.updateMinesCount();
         this.updateFlagsCount();
         this.updateTimer();
+        this.displayBestScore();
     }
 
     placeMines(excludeRow, excludeCol) {
@@ -221,7 +289,15 @@ class Minesweeper {
         const statusMessage = document.getElementById('status-message');
 
         if (won) {
-            statusMessage.textContent = `🎉 Selamat! Anda Menang! Waktu: ${this.timer} detik`;
+            this.updateBestScore();
+            const bestScore = this.bestScores[this.currentLevel];
+            let message = `🎉 Selamat! Anda Menang! Waktu: ${this.timer} detik`;
+
+            if (this.timer === bestScore) {
+                message += ' 🏆 NEW BEST SCORE!';
+            }
+
+            statusMessage.textContent = message;
             statusMessage.className = 'status-message show win';
         } else {
             statusMessage.textContent = '💥 Game Over! Anda Kalah!';
