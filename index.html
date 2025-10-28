@@ -10,7 +10,16 @@
 
 <body>
     <div class="container">
-        <h1>AVRORA MINESWEEPER</h1>
+        <div class="header">
+            <h1>AVRORA MINESWEEPER</h1>
+            <div class="header-controls">
+                <button class="icon-btn" id="dark-mode-toggle" title="Toggle Dark Mode">🌗</button>
+                <button class="icon-btn" id="sound-toggle" title="Toggle Sound">🔊</button>
+                <button class="icon-btn" id="save-game" title="Save Game">💾</button>
+                <button class="icon-btn" id="load-game" title="Load Game">📂</button>
+                <button class="icon-btn" id="show-leaderboard" title="Leaderboard">🏆</button>
+            </div>
+        </div>
 
         <div class="game-info">
             <div class="info-item">
@@ -62,6 +71,24 @@
         <div id="game-board" class="game-board"></div>
 
         <div class="status-message" id="status-message"></div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div class="modal" id="leaderboard-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏆 LEADERBOARD</h2>
+                <button class="close-modal" id="close-leaderboard">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="leaderboard-tabs">
+                    <button class="tab-btn active" data-tab="easy">Mudah</button>
+                    <button class="tab-btn" data-tab="medium">Sedang</button>
+                    <button class="tab-btn" data-tab="hard">Sulit</button>
+                </div>
+                <div id="leaderboard-content" class="leaderboard-list"></div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
