@@ -448,7 +448,26 @@ class Minesweeper {
     renderBoard() {
         const gameBoard = document.getElementById('game-board');
         gameBoard.innerHTML = '';
-        gameBoard.style.gridTemplateColumns = `repeat(${this.cols}, 35px)`;
+
+        // Calculate cell size dynamically based on number of columns
+        let cellSize = 35; // Default size for small grids
+
+        // Scale down cell size based on number of columns
+        if (this.cols > 16) {
+            // For grids larger than 16 columns, scale proportionally
+            cellSize = Math.max(600 / this.cols, 18); // Minimum 18px
+        }
+
+        // Also consider rows for very tall grids
+        if (this.rows > 16) {
+            const rowBasedSize = Math.max(600 / this.rows, 18);
+            cellSize = Math.min(cellSize, rowBasedSize);
+        }
+
+        // Round to nearest integer for cleaner rendering
+        cellSize = Math.floor(cellSize);
+
+        gameBoard.style.gridTemplateColumns = `repeat(${this.cols}, ${cellSize}px)`;
 
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
@@ -456,6 +475,9 @@ class Minesweeper {
                 cell.className = 'cell';
                 cell.dataset.row = i;
                 cell.dataset.col = j;
+                cell.style.width = `${cellSize}px`;
+                cell.style.height = `${cellSize}px`;
+                cell.style.fontSize = `${Math.max(Math.floor(cellSize * 0.55), 10)}px`;
 
                 cell.addEventListener('click', () => this.handleCellClick(i, j));
                 cell.addEventListener('contextmenu', (e) => {
