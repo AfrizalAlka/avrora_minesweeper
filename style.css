@@ -48,8 +48,10 @@ body.dark-mode h1 {
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 700px;
-    width: 100%;
+    width: fit-content;
+    max-width: 95vw;
+    max-height: 95vh;
+    overflow: auto;
 }
 
 .header {
@@ -240,6 +242,8 @@ h1 {
     border-radius: 10px;
     margin: 0 auto;
     width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 .cell {
