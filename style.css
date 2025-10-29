@@ -100,6 +100,20 @@ h1 {
     background: #667eea;
 }
 
+body.dark-mode .icon-btn {
+    background: #16213e;
+    border-color: #e94560;
+}
+
+body.dark-mode .icon-btn:hover {
+    background: #e94560;
+    border-color: #e94560;
+}
+
+body.dark-mode .icon-btn.active {
+    background: #e94560;
+}
+
 .game-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -122,6 +136,10 @@ h1 {
     color: #666;
 }
 
+body.dark-mode .label {
+    color: #a0aec0;
+}
+
 #mines-count,
 #flags-count,
 #timer,
@@ -129,6 +147,13 @@ h1 {
     font-size: 1.5em;
     font-weight: bold;
     color: #667eea;
+}
+
+body.dark-mode #mines-count,
+body.dark-mode #flags-count,
+body.dark-mode #timer,
+body.dark-mode #best-score {
+    color: #ff6b81;
 }
 
 .difficulty {
@@ -160,6 +185,22 @@ h1 {
     color: white;
 }
 
+body.dark-mode .difficulty-btn {
+    background: #16213e;
+    border-color: #e94560;
+    color: #e94560;
+}
+
+body.dark-mode .difficulty-btn:hover {
+    background: #e94560;
+    color: white;
+}
+
+body.dark-mode .difficulty-btn.active {
+    background: #e94560;
+    color: white;
+}
+
 .custom-settings {
     background: #f8f9fa;
     padding: 15px;
@@ -183,6 +224,10 @@ h1 {
     color: #667eea;
 }
 
+body.dark-mode .custom-input-group label {
+    color: #e94560;
+}
+
 .custom-input-group input {
     padding: 8px 12px;
     border: 2px solid #667eea;
@@ -193,10 +238,21 @@ h1 {
     font-weight: bold;
 }
 
+body.dark-mode .custom-input-group input {
+    background: #16213e;
+    border-color: #e94560;
+    color: #e8e8e8;
+}
+
 .custom-input-group input:focus {
     outline: none;
     border-color: #764ba2;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+body.dark-mode .custom-input-group input:focus {
+    border-color: #e94560;
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
 }
 
 .apply-custom-btn {
@@ -210,9 +266,17 @@ h1 {
     transition: all 0.3s ease;
 }
 
+body.dark-mode .apply-custom-btn {
+    background: #e94560;
+}
+
 .apply-custom-btn:hover {
     background: #764ba2;
     transform: scale(1.05);
+}
+
+body.dark-mode .apply-custom-btn:hover {
+    background: #ff6b81;
 }
 
 .new-game-btn {
@@ -229,9 +293,17 @@ h1 {
     transition: all 0.3s ease;
 }
 
+body.dark-mode .new-game-btn {
+    background: linear-gradient(135deg, #e94560 0%, #ff6b81 100%);
+}
+
 .new-game-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+body.dark-mode .new-game-btn:hover {
+    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
 }
 
 .game-board {
