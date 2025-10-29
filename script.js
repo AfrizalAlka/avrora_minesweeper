@@ -481,10 +481,10 @@ class Minesweeper {
             this.startTimer();
         }
 
-        this.revealCell(row, col);
+        this.revealCell(row, col, true); // true = initial click, play sound
     }
 
-    revealCell(row, col) {
+    revealCell(row, col, playSound = false) {
         if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
             return;
         }
@@ -507,15 +507,19 @@ class Minesweeper {
             this.playSound('lose');
             this.endGame(false);
         } else {
-            this.playSound('reveal');
+            // Only play sound once for the initial click
+            if (playSound) {
+                this.playSound('reveal');
+            }
+
             if (cell.adjacentMines > 0) {
                 cellElement.textContent = cell.adjacentMines;
                 cellElement.classList.add(`number-${cell.adjacentMines}`);
             } else {
-                // Reveal adjacent cells if no adjacent mines
+                // Reveal adjacent cells if no adjacent mines (recursive, no sound)
                 for (let di = -1; di <= 1; di++) {
                     for (let dj = -1; dj <= 1; dj++) {
-                        this.revealCell(row + di, col + dj);
+                        this.revealCell(row + di, col + dj, false); // false = no sound for recursive calls
                     }
                 }
             }
