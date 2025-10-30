@@ -141,6 +141,9 @@ class Minesweeper {
 
         const gameState = JSON.parse(saved);
 
+        // IMPORTANT: Stop any existing timer first to prevent multiple timers
+        this.stopTimer();
+
         // Restore game state
         this.board = gameState.board;
         this.rows = gameState.rows;
@@ -157,7 +160,7 @@ class Minesweeper {
         this.renderBoard();
         this.restoreBoardState();
 
-        // Restart timer
+        // Start timer (now safely after stopping old one)
         this.startTimer();
 
         // Update UI
