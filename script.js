@@ -202,15 +202,14 @@ class Minesweeper {
         this.darkMode = !this.darkMode;
         document.body.classList.toggle('dark-mode', this.darkMode);
         this.saveSetting('darkMode', this.darkMode);
+        this.updateDarkModeIcon();
         this.playSound('click');
     }
 
     toggleSound() {
         this.soundEnabled = !this.soundEnabled;
         this.saveSetting('soundEnabled', this.soundEnabled);
-
-        const soundBtn = document.getElementById('sound-toggle');
-        soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+        this.updateSoundIcon();
 
         if (this.soundEnabled) {
             this.playSound('click');
@@ -285,17 +284,42 @@ class Minesweeper {
         // Apply dark mode if enabled
         if (this.darkMode) {
             document.body.classList.add('dark-mode');
+            this.updateDarkModeIcon();
         }
 
-        // Update sound button
+        // Update sound button icon
+        this.updateSoundIcon();
+    }
+
+    updateDarkModeIcon() {
+        const darkModeBtn = document.getElementById('dark-mode-toggle');
+        const icon = darkModeBtn.querySelector('i');
+        if (this.darkMode) {
+            icon.className = 'bi bi-sun-fill';
+        } else {
+            icon.className = 'bi bi-moon-stars-fill';
+        }
+    }
+
+    updateSoundIcon() {
         const soundBtn = document.getElementById('sound-toggle');
-        if (soundBtn) {
-            soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+        const icon = soundBtn.querySelector('i');
+        if (this.soundEnabled) {
+            icon.className = 'bi bi-volume-up-fill';
+        } else {
+            icon.className = 'bi bi-volume-mute-fill';
         }
     }
 
     setupEventListeners() {
         document.getElementById('new-game').addEventListener('click', () => this.resetGame());
+
+        // Play again button in result modal
+        document.getElementById('play-again-btn').addEventListener('click', () => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('result-modal'));
+            if (modal) modal.hide();
+            this.resetGame();
+        });
 
         // Header controls
         document.getElementById('dark-mode-toggle').addEventListener('click', () => this.toggleDarkMode());
@@ -590,19 +614,72 @@ class Minesweeper {
             }
 
             const bestScore = this.bestScores[this.currentLevel];
-            let message = `🎉 Selamat! Anda Menang! Waktu: ${this.timer} detik`;
+            const isNewRecord = this.timer === bestScore;
 
-            if (this.timer === bestScore) {
-                message += ' 🏆 NEW BEST SCORE!';
-            }
-
-            statusMessage.textContent = message;
-            statusMessage.className = 'status-message show win';
+            // Show win modal
+            this.showResultModal(true, isNewRecord);
         } else {
-            statusMessage.textContent = '💥 Game Over! Anda Kalah!';
-            statusMessage.className = 'status-message show lose';
+            // Show lose modal
+            this.showResultModal(false);
             this.revealAllMines();
         }
+    }
+
+    showResultModal(isWin, isNewRecord = false) {
+        const modal = document.getElementById('result-modal');
+        const modalContent = document.getElementById('result-modal-content');
+        const modalTitle = document.getElementById('result-modal-title');
+        const resultIcon = document.getElementById('result-icon');
+        const resultMessage = document.getElementById('result-message');
+        const resultStats = document.getElementById('result-stats');
+
+        // Clear previous classes
+        modalContent.classList.remove('win', 'lose');
+
+        if (isWin) {
+            modalContent.classList.add('win');
+            modalTitle.innerHTML = '<i class="bi bi-trophy-fill"></i> KEMENANGAN!';
+            resultIcon.textContent = '🎉';
+            resultMessage.textContent = isNewRecord ? '🏆 REKOR BARU!' : 'Selamat! Anda Menang!';
+
+            resultStats.innerHTML = `
+                <div class="result-stat-item">
+                    <div class="result-stat-label">⏱️ Waktu</div>
+                    <div class="result-stat-value">${this.timer}s</div>
+                </div>
+                <div class="result-stat-item">
+                    <div class="result-stat-label">💣 Bom</div>
+                    <div class="result-stat-value">${this.minesCount}</div>
+                </div>
+                <div class="result-stat-item">
+                    <div class="result-stat-label">🏆 Best</div>
+                    <div class="result-stat-value">${this.bestScores[this.currentLevel] || '-'}</div>
+                </div>
+            `;
+
+            this.playSound('win');
+        } else {
+            modalContent.classList.add('lose');
+            modalTitle.innerHTML = '<i class="bi bi-x-circle-fill"></i> GAME OVER';
+            resultIcon.textContent = '💥';
+            resultMessage.textContent = 'Anda Kalah!';
+
+            resultStats.innerHTML = `
+                <div class="result-stat-item">
+                    <div class="result-stat-label">⏱️ Waktu</div>
+                    <div class="result-stat-value">${this.timer}s</div>
+                </div>
+                <div class="result-stat-item">
+                    <div class="result-stat-label">💣 Bom</div>
+                    <div class="result-stat-value">${this.minesCount}</div>
+                </div>
+            `;
+
+            this.playSound('lose');
+        }
+
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
     }
 
     revealAllMines() {
