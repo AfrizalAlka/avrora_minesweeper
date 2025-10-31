@@ -31,10 +31,10 @@
                         <i class="bi bi-volume-up-fill"></i>
                     </button>
                     <button class="btn btn-icon" id="save-game" title="Save Game">
-                        <i class="bi bi-save-fill"></i>
+                        <i class="bi bi-floppy-fill"></i>
                     </button>
                     <button class="btn btn-icon" id="load-game" title="Load Game">
-                        <i class="bi bi-folder-open-fill"></i>
+                        <i class="bi bi-folder2-open"></i>
                     </button>
                     <button class="btn btn-icon" id="show-leaderboard" title="Leaderboard">
                         <i class="bi bi-trophy-fill"></i>
@@ -123,6 +123,29 @@
 
                 <!-- Status Message -->
                 <div class="alert alert-dismissible fade" id="status-message" role="alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Result Modal -->
+    <div class="modal fade" id="result-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" id="result-modal-content">
+                <div class="modal-header" id="result-modal-header">
+                    <h5 class="modal-title" id="result-modal-title">
+                        <i class="bi bi-trophy-fill"></i> Game Over
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div id="result-icon" class="result-icon mb-3"></div>
+                    <h3 id="result-message" class="mb-3"></h3>
+                    <div id="result-stats" class="result-stats mb-3"></div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="play-again-btn">Main Lagi</button>
+                </div>
             </div>
         </div>
     </div>
