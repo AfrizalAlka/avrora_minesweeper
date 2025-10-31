@@ -219,7 +219,8 @@ class Minesweeper {
 
     showLeaderboard() {
         const modal = document.getElementById('leaderboard-modal');
-        modal.classList.add('show');
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
         this.displayLeaderboardTab('easy');
         this.playSound('click');
     }
@@ -303,35 +304,22 @@ class Minesweeper {
         document.getElementById('load-game').addEventListener('click', () => this.loadGame());
         document.getElementById('show-leaderboard').addEventListener('click', () => this.showLeaderboard());
 
-        // Leaderboard modal
-        document.getElementById('close-leaderboard').addEventListener('click', () => {
-            document.getElementById('leaderboard-modal').classList.remove('show');
-            this.playSound('click');
-        });
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                this.displayLeaderboardTab(e.target.dataset.tab);
+        // Leaderboard tabs - use Bootstrap nav-link
+        document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(link => {
+            link.addEventListener('shown.bs.tab', (e) => {
+                const level = e.target.getAttribute('data-bs-target').replace('#', '');
+                this.displayLeaderboardTab(level);
                 this.playSound('click');
             });
         });
 
-        // Close modal on outside click
-        document.getElementById('leaderboard-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'leaderboard-modal') {
-                e.target.classList.remove('show');
-                this.playSound('click');
-            }
-        });
-
-        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        // Difficulty buttons - correct class name
+        document.querySelectorAll('.btn-difficulty').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
+                document.querySelectorAll('.btn-difficulty').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
 
-                const level = e.target.dataset.level;
+                const level = e.currentTarget.dataset.level;
                 this.currentLevel = level;
 
                 const customSettings = document.getElementById('custom-settings');
