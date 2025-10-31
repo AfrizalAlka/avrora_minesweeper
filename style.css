@@ -78,6 +78,7 @@ body.dark-mode .game-container {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -364,11 +365,14 @@ body.dark-mode .cell.revealed {
 }
 
 @keyframes explode {
-    0%, 100% { 
-        transform: scale(1); 
+
+    0%,
+    100% {
+        transform: scale(1);
     }
-    50% { 
-        transform: scale(1.2); 
+
+    50% {
+        transform: scale(1.2);
     }
 }
 
@@ -379,14 +383,37 @@ body.dark-mode .cell.revealed {
     box-shadow: 0 4px 8px rgba(243, 156, 18, 0.4);
 }
 
-.cell.number-1 { color: #0000ff; }
-.cell.number-2 { color: #008000; }
-.cell.number-3 { color: #ff0000; }
-.cell.number-4 { color: #000080; }
-.cell.number-5 { color: #800000; }
-.cell.number-6 { color: #008080; }
-.cell.number-7 { color: #000000; }
-.cell.number-8 { color: #808080; }
+.cell.number-1 {
+    color: #0000ff;
+}
+
+.cell.number-2 {
+    color: #008000;
+}
+
+.cell.number-3 {
+    color: #ff0000;
+}
+
+.cell.number-4 {
+    color: #000080;
+}
+
+.cell.number-5 {
+    color: #800000;
+}
+
+.cell.number-6 {
+    color: #008080;
+}
+
+.cell.number-7 {
+    color: #000000;
+}
+
+.cell.number-8 {
+    color: #808080;
+}
 
 .alert {
     margin-top: 1rem;
@@ -548,33 +575,33 @@ body.dark-mode .leaderboard-time {
         font-size: 1.2rem;
         letter-spacing: 1px;
     }
-    
+
     .card-header {
         flex-direction: column;
         text-align: center;
         padding: 1rem !important;
     }
-    
+
     .header-controls {
         justify-content: center;
         flex-wrap: wrap;
     }
-    
+
     .btn-icon {
         width: 36px;
         height: 36px;
         font-size: 1rem;
     }
-    
+
     .btn-group {
         flex-direction: column;
     }
-    
+
     .btn-difficulty {
         border-radius: 12px !important;
         width: 100%;
     }
-    
+
     .cell {
         font-size: 0.9rem;
     }
