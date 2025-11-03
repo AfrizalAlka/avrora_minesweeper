@@ -109,9 +109,73 @@ class Minesweeper {
         this.saveLeaderboard();
     }
 
+    showToast(message, type = 'info') {
+        const toastEl = document.getElementById('notification-toast');
+        const toastBody = toastEl.querySelector('.toast-message');
+        const toastIcon = toastEl.querySelector('.toast-icon');
+
+        // Set message
+        toastBody.textContent = message;
+
+        // Remove all type classes
+        toastEl.classList.remove('toast-success', 'toast-error', 'toast-info');
+
+        // Set icon and type class
+        if (type === 'success') {
+            toastEl.classList.add('toast-success');
+            toastIcon.className = 'toast-icon bi bi-check-circle-fill';
+        } else if (type === 'error') {
+            toastEl.classList.add('toast-error');
+            toastIcon.className = 'toast-icon bi bi-x-circle-fill';
+        } else {
+            toastEl.classList.add('toast-info');
+            toastIcon.className = 'toast-icon bi bi-info-circle-fill';
+        }
+
+        // Show toast
+        const toast = new bootstrap.Toast(toastEl, {
+            autohide: true,
+            delay: 3000
+        });
+        toast.show();
+    }
+
+    showConfirm(message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirm-modal');
+            const messageEl = document.getElementById('confirm-message');
+            const okBtn = document.getElementById('confirm-ok-btn');
+
+            // Set message
+            messageEl.textContent = message;
+
+            // Show modal
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+
+            // Handle OK button
+            const handleOk = () => {
+                bsModal.hide();
+                okBtn.removeEventListener('click', handleOk);
+                modal.removeEventListener('hidden.bs.modal', handleCancel);
+                resolve(true);
+            };
+
+            // Handle Cancel (modal close)
+            const handleCancel = () => {
+                okBtn.removeEventListener('click', handleOk);
+                modal.removeEventListener('hidden.bs.modal', handleCancel);
+                resolve(false);
+            };
+
+            okBtn.addEventListener('click', handleOk);
+            modal.addEventListener('hidden.bs.modal', handleCancel);
+        });
+    }
+
     saveGame() {
         if (!this.gameStarted || this.gameOver) {
-            alert('Tidak ada game aktif untuk disimpan!');
+            this.showToast('Tidak ada game aktif untuk disimpan!', 'error');
             return;
         }
 
@@ -128,14 +192,22 @@ class Minesweeper {
         };
 
         localStorage.setItem('minesweeper-saved-game', JSON.stringify(gameState));
-        alert('✅ Game berhasil disimpan!');
+        this.showToast('Game berhasil disimpan!', 'success');
         this.playSound('flag');
     }
 
-    loadGame() {
+    async loadGame() {
+        // Validasi jika game sedang berjalan
+        if (this.gameStarted && !this.gameOver) {
+            const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda load game tersimpan. Lanjutkan?');
+            if (!confirmed) {
+                return;
+            }
+        }
+
         const saved = localStorage.getItem('minesweeper-saved-game');
         if (!saved) {
-            alert('Tidak ada game tersimpan!');
+            this.showToast('Tidak ada game tersimpan!', 'error');
             return;
         }
 
@@ -169,7 +241,7 @@ class Minesweeper {
         this.updateTimer();
         this.displayBestScore();
 
-        alert('✅ Game berhasil dimuat!');
+        this.showToast('Game berhasil dimuat!', 'success');
         this.playSound('reveal');
     }
 
@@ -312,7 +384,16 @@ class Minesweeper {
     }
 
     setupEventListeners() {
-        document.getElementById('new-game').addEventListener('click', () => this.resetGame());
+        document.getElementById('new-game').addEventListener('click', async () => {
+            // Validasi jika game sedang berjalan
+            if (this.gameStarted && !this.gameOver) {
+                const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda mulai game baru. Lanjutkan?');
+                if (!confirmed) {
+                    return;
+                }
+            }
+            this.resetGame();
+        });
 
         // Play again button in result modal
         document.getElementById('play-again-btn').addEventListener('click', () => {
@@ -339,11 +420,20 @@ class Minesweeper {
 
         // Difficulty buttons - correct class name
         document.querySelectorAll('.btn-difficulty').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
+                const level = e.currentTarget.dataset.level;
+
+                // Validasi jika game sedang berjalan dan level berbeda
+                if (this.gameStarted && !this.gameOver && this.currentLevel !== level) {
+                    const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda ganti level. Lanjutkan?');
+                    if (!confirmed) {
+                        return;
+                    }
+                }
+
                 document.querySelectorAll('.btn-difficulty').forEach(b => b.classList.remove('active'));
                 e.currentTarget.classList.add('active');
 
-                const level = e.currentTarget.dataset.level;
                 this.currentLevel = level;
 
                 const customSettings = document.getElementById('custom-settings');
@@ -376,20 +466,28 @@ class Minesweeper {
         });
 
         // Custom settings
-        document.getElementById('apply-custom').addEventListener('click', () => {
+        document.getElementById('apply-custom').addEventListener('click', async () => {
+            // Validasi jika game sedang berjalan
+            if (this.gameStarted && !this.gameOver) {
+                const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda terapkan pengaturan custom. Lanjutkan?');
+                if (!confirmed) {
+                    return;
+                }
+            }
+
             const rows = parseInt(document.getElementById('custom-rows').value);
             const cols = parseInt(document.getElementById('custom-cols').value);
             const mines = parseInt(document.getElementById('custom-mines').value);
 
             // Validation
             if (rows < 5 || rows > 30 || cols < 5 || cols > 30) {
-                alert('Ukuran grid harus antara 5 dan 30!');
+                this.showToast('Ukuran grid harus antara 5 dan 30!', 'error');
                 return;
             }
 
             const maxMines = Math.floor((rows * cols) * 0.8); // Max 80% of cells
             if (mines < 1 || mines > maxMines) {
-                alert(`Jumlah bom harus antara 1 dan ${maxMines}!`);
+                this.showToast(`Jumlah bom harus antara 1 dan ${maxMines}!`, 'error');
                 return;
             }
 
