@@ -427,10 +427,17 @@ class Minesweeper {
                 if (this.gameStarted && !this.gameOver && this.currentLevel !== level) {
                     const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda ganti level. Lanjutkan?');
                     if (!confirmed) {
+                        // User cancel, jangan lakukan apa-apa
                         return;
                     }
                 }
 
+                // Skip jika level sama (tidak perlu reset)
+                if (this.currentLevel === level && level !== 'custom') {
+                    return;
+                }
+
+                // Update active button dan level hanya setelah konfirmasi
                 document.querySelectorAll('.btn-difficulty').forEach(b => b.classList.remove('active'));
                 e.currentTarget.classList.add('active');
 
