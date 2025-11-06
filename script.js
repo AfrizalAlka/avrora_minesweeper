@@ -655,7 +655,15 @@ class Minesweeper {
         if (flagCount === cell.adjacentMines) {
             this.playSound('click');
 
-            // Reveal all non-flagged adjacent cells
+            // Add highlight animation to the clicked cell
+            const clickedCellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            clickedCellElement.classList.add('chord-highlight');
+            setTimeout(() => {
+                clickedCellElement.classList.remove('chord-highlight');
+            }, 400);
+
+            // Collect cells to reveal
+            const cellsToReveal = [];
             for (let di = -1; di <= 1; di++) {
                 for (let dj = -1; dj <= 1; dj++) {
                     if (di === 0 && dj === 0) continue;
@@ -666,11 +674,26 @@ class Minesweeper {
                     if (newRow >= 0 && newRow < this.rows && newCol >= 0 && newCol < this.cols) {
                         const adjacentCell = this.board[newRow][newCol];
                         if (!adjacentCell.revealed && !adjacentCell.flagged) {
-                            this.revealCell(newRow, newCol, false);
+                            cellsToReveal.push({ row: newRow, col: newCol });
                         }
                     }
                 }
             }
+
+            // Reveal cells with staggered animation
+            cellsToReveal.forEach((cellPos, index) => {
+                setTimeout(() => {
+                    const cellElement = document.querySelector(`[data-row="${cellPos.row}"][data-col="${cellPos.col}"]`);
+                    cellElement.classList.add('chord-reveal');
+
+                    this.revealCell(cellPos.row, cellPos.col, false);
+
+                    // Remove animation class after animation completes
+                    setTimeout(() => {
+                        cellElement.classList.remove('chord-reveal');
+                    }, 300);
+                }, index * 30); // 30ms delay between each cell
+            });
         }
     }
 
