@@ -439,6 +439,62 @@ body.dark-mode .cell.revealed {
     }
 }
 
+/* Chord Reveal Animations */
+.cell.revealed:hover:not(.mine) {
+    cursor: pointer;
+    background: linear-gradient(145deg, #f0f5ff, #e8eeff);
+    box-shadow: inset 0 3px 6px rgba(102, 126, 234, 0.2), 0 0 0 3px rgba(102, 126, 234, 0.3);
+    transition: all 0.2s ease;
+}
+
+body.dark-mode .cell.revealed:hover:not(.mine) {
+    background: linear-gradient(145deg, #2d2a5f, #252256);
+    box-shadow: inset 0 3px 6px rgba(139, 92, 246, 0.3), 0 0 0 3px rgba(139, 92, 246, 0.4);
+}
+
+.cell.chord-highlight {
+    animation: chordPulse 0.4s ease;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.6), 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+body.dark-mode .cell.chord-highlight {
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.6), 0 4px 12px rgba(139, 92, 246, 0.5);
+}
+
+@keyframes chordPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.cell.chord-reveal {
+    animation: chordRevealAnim 0.3s ease;
+}
+
+@keyframes chordRevealAnim {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 .cell.flagged {
     background: linear-gradient(145deg, #f39c12, #e67e22);
     color: white;
