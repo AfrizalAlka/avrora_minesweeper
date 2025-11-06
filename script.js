@@ -604,7 +604,16 @@ class Minesweeper {
     }
 
     handleCellClick(row, col) {
-        if (this.gameOver || this.board[row][col].flagged || this.board[row][col].revealed) {
+        if (this.gameOver || this.board[row][col].flagged) {
+            return;
+        }
+
+        // Chord reveal: if cell is already revealed and has a number, try to open surrounding cells
+        if (this.board[row][col].revealed) {
+            const cell = this.board[row][col];
+            if (cell.adjacentMines > 0) {
+                this.chordReveal(row, col);
+            }
             return;
         }
 
@@ -617,6 +626,52 @@ class Minesweeper {
         }
 
         this.revealCell(row, col, true); // true = initial click, play sound
+    }
+
+    countAdjacentFlags(row, col) {
+        let flagCount = 0;
+        for (let di = -1; di <= 1; di++) {
+            for (let dj = -1; dj <= 1; dj++) {
+                if (di === 0 && dj === 0) continue;
+
+                const newRow = row + di;
+                const newCol = col + dj;
+
+                if (newRow >= 0 && newRow < this.rows && newCol >= 0 && newCol < this.cols) {
+                    if (this.board[newRow][newCol].flagged) {
+                        flagCount++;
+                    }
+                }
+            }
+        }
+        return flagCount;
+    }
+
+    chordReveal(row, col) {
+        const cell = this.board[row][col];
+        const flagCount = this.countAdjacentFlags(row, col);
+
+        // Only reveal if the number of adjacent flags matches the cell's number
+        if (flagCount === cell.adjacentMines) {
+            this.playSound('click');
+
+            // Reveal all non-flagged adjacent cells
+            for (let di = -1; di <= 1; di++) {
+                for (let dj = -1; dj <= 1; dj++) {
+                    if (di === 0 && dj === 0) continue;
+
+                    const newRow = row + di;
+                    const newCol = col + dj;
+
+                    if (newRow >= 0 && newRow < this.rows && newCol >= 0 && newCol < this.cols) {
+                        const adjacentCell = this.board[newRow][newCol];
+                        if (!adjacentCell.revealed && !adjacentCell.flagged) {
+                            this.revealCell(newRow, newCol, false);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     revealCell(row, col, playSound = false) {
