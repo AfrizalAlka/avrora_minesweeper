@@ -1,4 +1,4 @@
-# 🎮 AVRORA MINESWEEPER
+﻿# ðŸŽ® AVRORA MINESWEEPER
 
 Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dilengkapi dengan Bootstrap 5, dark mode, sistem notifikasi, dan fitur-fitur interaktif untuk pengalaman bermain yang maksimal!
 
@@ -6,34 +6,40 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 ![Bootstrap](https://img.shields.io/badge/bootstrap-5.3.3-purple.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## ✨ Fitur Utama
+## âœ¨ Fitur Utama
 
-### 🎯 Gameplay Klasik
+### ðŸŽ¯ Gameplay Klasik
 - **3 Level Preset**: Mudah (8x8), Sedang (12x12), Sulit (16x16)
 - **Custom Grid**: Buat ukuran papan sendiri (5x5 hingga 30x30)
 - **Auto-Clear**: Otomatis membuka area kosong di sekitar sel dengan angka 0
+- **âš¡ Chord Reveal**: Klik angka yang terbuka untuk auto-reveal sel sekitarnya
 - **Sistem Flag**: Klik kanan untuk menandai posisi bom
 - **Timer Real-time**: Lacak waktu permainan Anda
-- **🔒 Progress Protection**: Validasi konfirmasi saat ganti level/load game
+- **ðŸ”’ Progress Protection**: Validasi konfirmasi saat ganti level/load game
 
-### 🎨 Tampilan & UX Modern
-- **🌗 Dark/Light Mode**: Toggle tema gelap/terang dengan animasi smooth
+### ðŸŽ¨ Tampilan & UX Modern
+- **ðŸŒ— Dark/Light Mode**: Toggle tema gelap/terang dengan animasi smooth
 - **Bootstrap 5.3.3**: Framework modern untuk UI yang responsif
-- **Background System**: Gambar background dinamis untuk light/dark mode
+- **Background System**: Gambar background dinamis untuk light/dark mode dengan cross-fade transition
 - **Glassmorphism**: Efek backdrop blur untuk UI yang elegan
 - **Color Scheme**: 
-  - Light Mode: Purple gradient (#667eea → #764ba2)
-  - Dark Mode: Indigo/Purple (#6366f1 → #8b5cf6)
+  - Light Mode: Purple gradient (#667eea â†’ #764ba2)
+  - Dark Mode: Indigo/Purple (#6366f1 â†’ #8b5cf6)
 - **High Contrast Board**: Border tebal 3px dan shadow untuk visibilitas maksimal
-- **Animasi Smooth**: Transisi dan efek visual yang halus
+- **ðŸŽ­ Animasi Interaktif**: 
+  - Smooth cross-fade background (0.6s ease-in-out)
+  - Chord reveal pulse animation
+  - Staggered cell reveal effect
+  - Hover glow pada angka yang bisa di-chord
+  - Explode animation saat kalah
 - **Desain Responsif**: Optimal di desktop dan mobile (<768px adaptive)
 - **Icon System**: Bootstrap Icons 1.11.3 dengan efek interaktif
 
-### 🔔 Sistem Notifikasi
+### ðŸ”” Sistem Notifikasi
 - **Toast Notifications**: Notifikasi modern yang slide dari kanan atas
-  - ✅ Success (hijau): Save/Load berhasil
-  - ❌ Error (merah): Pesan kesalahan
-  - ℹ️ Info (biru): Informasi umum
+  - âœ… Success (hijau): Save/Load berhasil
+  - âŒ Error (merah): Pesan kesalahan
+  - â„¹ï¸ Info (biru): Informasi umum
 - **Modal Konfirmasi**: Popup konfirmasi dengan icon warning
   - Konfirmasi ganti level saat game berjalan
   - Konfirmasi load game saat game berjalan
@@ -42,69 +48,75 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 - **Result Modal**: Popup animasi kemenangan/kekalahan
   - Icon bouncing dengan animasi pulse
   - Statistik lengkap (waktu, level, best score)
-  - Indikator rekor baru 🏆
+  - Indikator rekor baru ðŸ†
   - Tombol "Main Lagi"
 
-### 🎵 Audio
+### ðŸŽµ Audio
 - **Sound Effects**: 
-  - Klik sel 🖱️
-  - Pasang bendera 🚩
-  - Buka sel ✨
-  - Menang 🎉
-  - Kalah 💥
+  - Klik sel ðŸ–±ï¸
+  - Pasang bendera ðŸš©
+  - Buka sel âœ¨
+  - Menang ðŸŽ‰
+  - Kalah ðŸ’¥
 - **Toggle Sound**: Nyalakan/matikan sound dengan icon interaktif
 - **Web Audio API**: Sound generator tanpa file eksternal
 
-### 💾 Sistem Penyimpanan
+### ðŸ’¾ Sistem Penyimpanan
 - **Save/Load Game**: Simpan dan lanjutkan permainan kapan saja
-  - Icon: 💾 Floppy disk untuk save
-  - Icon: 📂 Folder terbuka untuk load
+  - Icon: ðŸ’¾ Floppy disk untuk save
+  - Icon: ðŸ“‚ Folder terbuka untuk load
   - Notifikasi toast saat berhasil
   - Validasi konfirmasi jika game sedang berjalan
 - **Best Score**: Menyimpan waktu terbaik untuk setiap level
 - **Persistent Data**: Semua data tersimpan di localStorage browser
 - **Progress Protection**: Tidak bisa kehilangan progress secara tidak sengaja
 
-### 🏆 Leaderboard
+### ðŸ† Leaderboard
 - **Top 10 Ranking**: Untuk setiap level kesulitan (easy, medium, hard)
-- **Medali**: 🥇 🥈 🥉 untuk top 3
+- **Medali**: ðŸ¥‡ ðŸ¥ˆ ðŸ¥‰ untuk top 3
 - **History**: Lihat tanggal dan waktu pencapaian
 - **Bootstrap Tabs**: Navigasi smooth antar level
 - **Bootstrap Modal**: Fullscreen leaderboard view
 
-## 🎯 Cara Bermain
+## ðŸŽ¯ Cara Bermain
 
 ### Kontrol Dasar
 1. **Klik Kiri** pada sel untuk membuka
-2. **Klik Kanan** pada sel untuk memasang bendera 🚩
-3. Angka menunjukkan jumlah ranjau di 8 sel sekitarnya
-4. Buka semua sel aman untuk menang!
+2. **Klik Kanan** pada sel untuk memasang bendera ðŸš©
+3. **âš¡ Chord Reveal**: Klik pada angka yang sudah terbuka untuk auto-reveal
+   - Pastikan jumlah bendera di sekitar angka sudah sesuai
+   - Sel sekitar yang tidak ada bendera akan terbuka otomatis
+   - Animasi staggered reveal untuk visual feedback
+4. Angka menunjukkan jumlah ranjau di 8 sel sekitarnya
+5. Buka semua sel aman untuk menang!
 
 ### Tombol Kontrol Header
-- **🎲 GAME BARU**: Mulai permainan baru (konfirmasi jika game berjalan)
-- **🌗 Dark Mode**: Toggle tema gelap/terang (icon berubah: 🌙/☀️)
-- **🔊 Sound**: Toggle sound effect (icon berubah: 🔊/🔇)
-- **💾 Save**: Simpan permainan saat ini (floppy disk icon)
-- **📂 Load**: Muat permainan tersimpan (folder icon)
-- **🏆 Leaderboard**: Lihat ranking waktu terbaik
+- **ðŸŽ² GAME BARU**: Mulai permainan baru (konfirmasi jika game berjalan)
+- **ðŸŒ— Dark Mode**: Toggle tema gelap/terang (icon berubah: ðŸŒ™/â˜€ï¸)
+- **ðŸ”Š Sound**: Toggle sound effect (icon berubah: ðŸ”Š/ðŸ”‡)
+- **ðŸ’¾ Save**: Simpan permainan saat ini (floppy disk icon)
+- **ðŸ“‚ Load**: Muat permainan tersimpan (folder icon)
+- **ðŸ† Leaderboard**: Lihat ranking waktu terbaik
 
 ### Tips & Trik
 - Mulai dari pojok atau tepi untuk area yang lebih aman
 - Gunakan bendera untuk menandai bom yang sudah pasti
+- **âš¡ Gunakan chord reveal** untuk membuka sel lebih cepat!
 - Angka 0 akan membuka area sekitarnya secara otomatis
 - Perhatikan pola angka untuk deduksi logis
 - Save game Anda sebelum mencoba area berisiko tinggi!
+- Hover pada angka untuk melihat glow effect (indikasi bisa di-chord)
 
-## 🎲 Level Kesulitan
+## ðŸŽ² Level Kesulitan
 
 | Level | Ukuran Grid | Jumlah Bom | Kesulitan |
 |-------|-------------|------------|-----------|
-| **Mudah** | 8x8 (64 sel) | 10 bom | ⭐ Pemula |
-| **Sedang** | 12x12 (144 sel) | 20 bom | ⭐⭐ Menengah |
-| **Sulit** | 16x16 (256 sel) | 40 bom | ⭐⭐⭐ Expert |
-| **Custom** | 5x5 - 30x30 | 1 - 80% sel | ⚙️ Sesuaikan |
+| **Mudah** | 8x8 (64 sel) | 10 bom | â­ Pemula |
+| **Sedang** | 12x12 (144 sel) | 20 bom | â­â­ Menengah |
+| **Sulit** | 16x16 (256 sel) | 40 bom | â­â­â­ Expert |
+| **Custom** | 5x5 - 30x30 | 1 - 80% sel | âš™ï¸ Sesuaikan |
 
-## 🚀 Cara Menjalankan
+## ðŸš€ Cara Menjalankan
 
 ### Metode 1: Direct Browser
 1. Clone atau download repository ini
@@ -123,7 +135,7 @@ http://localhost/avrora_minesweeper
 2. Klik kanan pada `index.html`
 3. Pilih "Open with Live Server"
 
-## 💻 Teknologi
+## ðŸ’» Teknologi
 
 ### Frontend Framework & Libraries
 - **Bootstrap 5.3.3**: Framework CSS modern untuk layout & components
@@ -148,26 +160,29 @@ http://localhost/avrora_minesweeper
 - **CSS Grid**: Layout papan permainan yang responsif
 - **Event Delegation**: Optimasi event handling
 
-## 📁 Struktur File
+## ðŸ“ Struktur File
 
 ```
 avrora_minesweeper/
-│
-├── index.html          # HTML dengan Bootstrap 5 structure
-├── style.css           # Custom styling + Bootstrap integration (888 baris)
-├── script.js           # Game logic + Bootstrap API integration (838 baris)
-├── assets/
-│   ├── README.md      # Panduan background images
-│   ├── bg-light.jpg   # Background untuk light mode (opsional)
-│   └── bg-dark.jpg    # Background untuk dark mode (opsional)
-└── README.md          # Dokumentasi lengkap (file ini)
+â”‚
+â”œâ”€â”€ index.html          # HTML dengan Bootstrap 5 structure
+â”œâ”€â”€ style.css           # Custom styling + Bootstrap integration (1070+ baris)
+â”œâ”€â”€ script.js           # Game logic + Bootstrap API integration (893+ baris)
+â”œâ”€â”€ assets/
+â”‚   â”œâ”€â”€ README.md      # Panduan background images
+â”‚   â”œâ”€â”€ img/
+â”‚   â”‚   â”œâ”€â”€ light-bg.png   # Background untuk light mode
+â”‚   â”‚   â””â”€â”€ dark-bg.png    # Background untuk dark mode
+â””â”€â”€ README.md          # Dokumentasi lengkap (file ini)
 ```
 
-## 🎮 Fitur Teknis
+## ðŸŽ® Fitur Teknis
 
 ### Game Logic
 - Algoritma penempatan bom acak yang seimbang
 - Recursive flood-fill untuk auto-clear
+- **âš¡ Chord reveal algorithm**: Smart adjacent cell opening
+- Flag counting system untuk chord validation
 - Validasi custom grid size (5-30)
 - Validasi maksimal bom (80% dari total sel)
 - Win/lose condition detection
@@ -206,21 +221,28 @@ avrora_minesweeper/
 ```
 
 ### Browser Compatibility
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
+- âœ… Chrome 90+
+- âœ… Firefox 88+
+- âœ… Safari 14+
+- âœ… Edge 90+
+- âœ… Mobile browsers (iOS Safari, Chrome Mobile)
 
-## 🔄 Update Log
+## ðŸ”„ Update Log
 
 ### Version 1.4 (Current - Bootstrap Edition) 🎉
 - ✨ **Bootstrap 5.3.3 Migration**: Complete UI overhaul
 - 🎨 **Modern Design System**: Glassmorphism + gradient backgrounds
+- 🌈 **Background Cross-fade**: Smooth 0.6s transition antara light/dark mode
+- ⚡ **Chord Reveal Feature**: Klik angka terbuka untuk auto-reveal sel sekitar
+- 🎭 **Advanced Animations**: 
+  - Pulse animation pada sel yang di-chord
+  - Staggered reveal effect (30ms delay antar sel)
+  - Hover glow effect untuk visual feedback
+  - Smooth scale & opacity transitions
 - 🔔 **Toast Notifications**: Success/Error/Info messages
 - 💬 **Confirmation Modal**: Better UX untuk validasi
 - 🎯 **Result Modal**: Animated win/lose popup dengan statistik
-- 🌈 **Dark Mode Redesign**: Indigo/purple color scheme
+- 🌗 **Dark Mode Redesign**: Indigo/purple color scheme
 - 🔒 **Progress Protection**: Validasi konfirmasi untuk prevent data loss
 - 🎨 **High Contrast Board**: 3px borders untuk visibility
 - 💾 **Better Icons**: Floppy disk (save) & folder (load)
@@ -229,33 +251,33 @@ avrora_minesweeper/
 - 🐛 **Bug Fixes**: Fixed level change confirmation flow
 
 ### Version 1.3
-- 🎨 Improved UI contrast and colors
-- 🔧 Fixed header overlap issues
-- 🐛 Fixed difficulty button click problems
-- 🎨 Enhanced dark mode styling
+- ðŸŽ¨ Improved UI contrast and colors
+- ðŸ”§ Fixed header overlap issues
+- ðŸ› Fixed difficulty button click problems
+- ðŸŽ¨ Enhanced dark mode styling
 
 ### Version 1.2
-- ✨ Added Dark/Light mode toggle
-- 🎵 Implemented sound effects system
-- 💾 Added save/load game functionality
-- 🏆 Created leaderboard system
-- 🎨 Enhanced UI with header controls
-- 📱 Improved mobile responsiveness
+- âœ¨ Added Dark/Light mode toggle
+- ðŸŽµ Implemented sound effects system
+- ðŸ’¾ Added save/load game functionality
+- ðŸ† Created leaderboard system
+- ðŸŽ¨ Enhanced UI with header controls
+- ðŸ“± Improved mobile responsiveness
 
 ### Version 1.1
-- 🎯 Added custom grid size feature
-- 📊 Implemented best score tracking
-- ⚙️ Added grid size validation
-- 💎 Improved color contrast
+- ðŸŽ¯ Added custom grid size feature
+- ðŸ“Š Implemented best score tracking
+- âš™ï¸ Added grid size validation
+- ðŸ’Ž Improved color contrast
 
 ### Version 1.0
-- 🎮 Core minesweeper gameplay
-- 🎲 3 difficulty levels
-- ⏱️ Timer system
-- 🚩 Flag mechanism
-- 🎨 Modern responsive design
+- ðŸŽ® Core minesweeper gameplay
+- ðŸŽ² 3 difficulty levels
+- â±ï¸ Timer system
+- ðŸš© Flag mechanism
+- ðŸŽ¨ Modern responsive design
 
-## 🤝 Kontribusi
+## ðŸ¤ Kontribusi
 
 Kontribusi selalu terbuka! Silakan:
 1. Fork repository ini
@@ -264,17 +286,17 @@ Kontribusi selalu terbuka! Silakan:
 4. Push ke branch (`git push origin feature/AmazingFeature`)
 5. Buat Pull Request
 
-## 📝 Lisensi
+## ðŸ“ Lisensi
 
 Project ini bersifat open source dan bebas digunakan untuk pembelajaran dan modifikasi.
 
 **MIT License** - Lihat file LICENSE untuk detail
 
-## 👨‍💻 Developer
+## ðŸ‘¨â€ðŸ’» Developer
 
-Developed with ❤️ by **AfrizalAlka**
+Developed with â¤ï¸ by **AfrizalAlka**
 
-## 🙏 Acknowledgments
+## ðŸ™ Acknowledgments
 
 - Terinspirasi dari game Minesweeper klasik Microsoft
 - **Bootstrap 5.3.3** untuk framework UI modern
@@ -283,11 +305,11 @@ Developed with ❤️ by **AfrizalAlka**
 - Glassmorphism design trend untuk modern UI
 - Color schemes inspired by modern web design
 
-## 🎨 Design Credits
+## ðŸŽ¨ Design Credits
 
 ### Color Palette
-- **Light Mode**: Purple gradient (#667eea → #764ba2)
-- **Dark Mode**: Indigo/Purple (#6366f1 → #8b5cf6 → #1e1b4b)
+- **Light Mode**: Purple gradient (#667eea â†’ #764ba2)
+- **Dark Mode**: Indigo/Purple (#6366f1 â†’ #8b5cf6 â†’ #1e1b4b)
 - **Success**: Emerald green (#10b981)
 - **Error**: Red (#ef4444)
 - **Warning**: Orange (#f59e0b)
@@ -298,27 +320,33 @@ Developed with ❤️ by **AfrizalAlka**
 
 ---
 
-**⭐ Jangan lupa beri bintang jika Anda menyukai project ini!**
+**â­ Jangan lupa beri bintang jika Anda menyukai project ini!**
 
-Selamat bermain dan semoga beruntung! 🎉💣🚩
+Selamat bermain dan semoga beruntung! ðŸŽ‰ðŸ’£ðŸš©
 
-## 📞 Support
+## ðŸ“ž Support
 
 Jika Anda menemukan bug atau punya saran:
 - Buka issue di GitHub repository
 - Contact: AfrizalAlka
 
-## 🔮 Future Features (Roadmap)
+## ðŸ”® Future Features (Roadmap)
 
+- [ ] Middle-click support untuk chord reveal
+- [ ] Visual tutorial untuk chord reveal
 - [ ] Multiplayer mode via WebSocket
 - [ ] Achievement system dengan badges
 - [ ] Daily challenges
 - [ ] Theme customizer
 - [ ] Export/import leaderboard
 - [ ] PWA (Progressive Web App) support
-- [ ] Touch gestures untuk mobile
+- [ ] Touch gestures untuk mobile (long-press untuk flag)
 - [ ] Hint system untuk pemula
-- [ ] Replay system
+- [ ] Replay system dengan step-by-step
 - [ ] Social sharing untuk scores
+- [ ] Customizable sound effects
+- [ ] Animation speed settings
 
-**Happy Mining!** 🎮⛏️💎
+**Happy Mining!** ðŸŽ®â›ï¸ðŸ’Ž
+
+
