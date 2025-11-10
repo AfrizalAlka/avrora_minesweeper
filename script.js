@@ -35,6 +35,7 @@ class Minesweeper {
         this.sounds = {
             click: this.createBeep(800, 0.1, 'sine'),
             flag: this.createBeep(600, 0.1, 'square'),
+            question: this.createBeep(700, 0.12, 'sine'),
             reveal: this.createBeep(400, 0.15, 'triangle'),
             win: this.createBeep(1000, 0.3, 'sine'),
             lose: this.createBeep(200, 0.5, 'sawtooth')
@@ -265,6 +266,11 @@ class Minesweeper {
                 if (cell.flagged) {
                     cellElement.classList.add('flagged');
                     cellElement.textContent = '🚩';
+                }
+
+                if (cell.questioned) {
+                    cellElement.classList.add('questioned');
+                    cellElement.textContent = '❓';
                 }
             }
         }
@@ -508,6 +514,7 @@ class Minesweeper {
                     mine: false,
                     revealed: false,
                     flagged: false,
+                    questioned: false,
                     adjacentMines: 0
                 };
             }
@@ -746,17 +753,28 @@ class Minesweeper {
             return;
         }
 
-        this.playSound('flag');
-
         const cell = this.board[row][col];
         const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
 
+        // Cycle: Empty → Flag → Question → Empty
         if (cell.flagged) {
+            // Flag → Question
+            this.playSound('question');
             cell.flagged = false;
+            cell.questioned = true;
             cellElement.classList.remove('flagged');
-            cellElement.textContent = '';
+            cellElement.classList.add('questioned');
+            cellElement.textContent = '❓';
             this.flagsCount--;
+        } else if (cell.questioned) {
+            // Question → Empty
+            this.playSound('click');
+            cell.questioned = false;
+            cellElement.classList.remove('questioned');
+            cellElement.textContent = '';
         } else {
+            // Empty → Flag
+            this.playSound('flag');
             cell.flagged = true;
             cellElement.classList.add('flagged');
             cellElement.textContent = '🚩';
