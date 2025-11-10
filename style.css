@@ -502,6 +502,32 @@ body.dark-mode .cell.chord-highlight {
     box-shadow: 0 4px 8px rgba(243, 156, 18, 0.4);
 }
 
+.cell.questioned {
+    background: linear-gradient(145deg, #3498db, #2980b9);
+    color: white;
+    border-color: #1c5a85;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4);
+    animation: questionPulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .cell.questioned {
+    background: linear-gradient(145deg, #4a9eff, #3a7fd5);
+    border-color: #2563a8;
+    box-shadow: 0 4px 8px rgba(74, 158, 255, 0.5);
+}
+
+@keyframes questionPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.85;
+    }
+}
+
 .cell.number-1 {
     color: #0000ff;
 }

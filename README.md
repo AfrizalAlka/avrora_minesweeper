@@ -8,14 +8,17 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 
 ## âœ¨ Fitur Utama
 
-### ðŸŽ¯ Gameplay Klasik
+### 🎯 Gameplay Klasik
 - **3 Level Preset**: Mudah (8x8), Sedang (12x12), Sulit (16x16)
 - **Custom Grid**: Buat ukuran papan sendiri (5x5 hingga 30x30)
 - **Auto-Clear**: Otomatis membuka area kosong di sekitar sel dengan angka 0
-- **âš¡ Chord Reveal**: Klik angka yang terbuka untuk auto-reveal sel sekitarnya
+- **⚡ Chord Reveal**: Klik angka yang terbuka untuk auto-reveal sel sekitarnya
+- **❓ Question Mark Mode**: Tandai sel yang masih ragu dengan `❓`
+  - Cycle klik kanan: 🚩 Flag → ❓ Question → ⬜ Empty
+  - Membantu strategi dan deduksi logis
 - **Sistem Flag**: Klik kanan untuk menandai posisi bom
 - **Timer Real-time**: Lacak waktu permainan Anda
-- **ðŸ”’ Progress Protection**: Validasi konfirmasi saat ganti level/load game
+- **🔒 Progress Protection**: Validasi konfirmasi saat ganti level/load game
 
 ### ðŸŽ¨ Tampilan & UX Modern
 - **ðŸŒ— Dark/Light Mode**: Toggle tema gelap/terang dengan animasi smooth
@@ -82,8 +85,11 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 
 ### Kontrol Dasar
 1. **Klik Kiri** pada sel untuk membuka
-2. **Klik Kanan** pada sel untuk memasang bendera ðŸš©
-3. **âš¡ Chord Reveal**: Klik pada angka yang sudah terbuka untuk auto-reveal
+2. **Klik Kanan** untuk cycle marking:
+   - Klik 1x: 🚩 Flag (tandai sebagai bom)
+   - Klik 2x: ❓ Question (masih ragu)
+   - Klik 3x: ⬜ Empty (hapus marking)
+3. **⚡ Chord Reveal**: Klik pada angka yang sudah terbuka untuk auto-reveal
    - Pastikan jumlah bendera di sekitar angka sudah sesuai
    - Sel sekitar yang tidak ada bendera akan terbuka otomatis
    - Animasi staggered reveal untuk visual feedback
@@ -100,8 +106,9 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 
 ### Tips & Trik
 - Mulai dari pojok atau tepi untuk area yang lebih aman
-- Gunakan bendera untuk menandai bom yang sudah pasti
-- **âš¡ Gunakan chord reveal** untuk membuka sel lebih cepat!
+- **🚩 Gunakan flag** untuk menandai bom yang sudah pasti
+- **❓ Gunakan question mark** untuk menandai sel yang masih ragu
+- **⚡ Gunakan chord reveal** untuk membuka sel lebih cepat!
 - Angka 0 akan membuka area sekitarnya secara otomatis
 - Perhatikan pola angka untuk deduksi logis
 - Save game Anda sebelum mencoba area berisiko tinggi!
@@ -234,11 +241,16 @@ avrora_minesweeper/
 - 🎨 **Modern Design System**: Glassmorphism + gradient backgrounds
 - 🌈 **Background Cross-fade**: Smooth 0.6s transition antara light/dark mode
 - ⚡ **Chord Reveal Feature**: Klik angka terbuka untuk auto-reveal sel sekitar
+- ❓ **Question Mark Mode**: Cycle 3-state marking (🚩 → ❓ → ⬜)
+  - Tandai sel yang masih ragu dengan question mark
+  - Blue gradient styling dengan pulse animation
+  - Sound effect berbeda untuk setiap state
 - 🎭 **Advanced Animations**: 
   - Pulse animation pada sel yang di-chord
   - Staggered reveal effect (30ms delay antar sel)
   - Hover glow effect untuk visual feedback
   - Smooth scale & opacity transitions
+  - Question mark pulse animation
 - 🔔 **Toast Notifications**: Success/Error/Info messages
 - 💬 **Confirmation Modal**: Better UX untuk validasi
 - 🎯 **Result Modal**: Animated win/lose popup dengan statistik
