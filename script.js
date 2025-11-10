@@ -627,7 +627,7 @@ class Minesweeper {
         // Auto-remove question mark when clicking to reveal
         const cell = this.board[row][col];
         const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        
+
         if (cell.questioned) {
             cell.questioned = false;
             cellElement.classList.remove('questioned');
