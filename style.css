@@ -206,6 +206,11 @@ body.dark-mode .card-header {
     padding: 1rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .info-card:hover {
@@ -220,8 +225,9 @@ body.dark-mode .info-card {
 .info-label {
     font-size: 0.85rem;
     color: #6c757d;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 body.dark-mode .info-label {
@@ -229,18 +235,23 @@ body.dark-mode .info-label {
 }
 
 .info-value {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 800;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1;
 }
 
 body.dark-mode .info-value {
     background: linear-gradient(135deg, var(--dark-primary), var(--dark-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+body.dark-mode .text-muted {
+    color: var(--dark-text-secondary) !important;
 }
 
 .btn-difficulty {
