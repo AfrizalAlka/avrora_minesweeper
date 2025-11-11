@@ -11,6 +11,7 @@ class Minesweeper {
         this.timer = 0;
         this.timerInterval = null;
         this.currentLevel = 'easy';
+        this.isPaused = false;
 
         // Sound settings
         this.soundEnabled = this.loadSetting('soundEnabled', true);
@@ -414,6 +415,8 @@ class Minesweeper {
         document.getElementById('save-game').addEventListener('click', () => this.saveGame());
         document.getElementById('load-game').addEventListener('click', () => this.loadGame());
         document.getElementById('show-leaderboard').addEventListener('click', () => this.showLeaderboard());
+        document.getElementById('pause-game').addEventListener('click', () => this.pauseGame());
+        document.getElementById('resume-game').addEventListener('click', () => this.resumeGame());
 
         // Leaderboard tabs - use Bootstrap nav-link
         document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(link => {
@@ -611,7 +614,7 @@ class Minesweeper {
     }
 
     handleCellClick(row, col) {
-        if (this.gameOver || this.board[row][col].flagged) {
+        if (this.gameOver || this.board[row][col].flagged || this.isPaused) {
             return;
         }
 
@@ -759,7 +762,7 @@ class Minesweeper {
     }
 
     handleRightClick(row, col) {
-        if (this.gameOver || this.board[row][col].revealed) {
+        if (this.gameOver || this.board[row][col].revealed || this.isPaused) {
             return;
         }
 
@@ -898,17 +901,68 @@ class Minesweeper {
         }
     }
 
+    pauseGame() {
+        if (!this.gameStarted || this.gameOver || this.isPaused) {
+            return;
+        }
+
+        this.isPaused = true;
+        this.stopTimer();
+
+        // Show pause overlay with animation
+        const overlay = document.getElementById('pause-overlay');
+        const board = document.getElementById('game-board');
+        overlay.style.display = 'flex';
+        board.classList.add('paused');
+
+        // Update pause button
+        const pauseBtn = document.getElementById('pause-game');
+        pauseBtn.style.display = 'none';
+
+        this.playSound('click');
+    }
+
+    resumeGame() {
+        if (!this.isPaused) {
+            return;
+        }
+
+        this.isPaused = false;
+        this.startTimer();
+
+        // Hide pause overlay with animation
+        const overlay = document.getElementById('pause-overlay');
+        const board = document.getElementById('game-board');
+        overlay.style.display = 'none';
+        board.classList.remove('paused');
+
+        // Update pause button
+        const pauseBtn = document.getElementById('pause-game');
+        pauseBtn.style.display = 'flex';
+
+        this.playSound('click');
+    }
+
     startTimer() {
         this.timerInterval = setInterval(() => {
             this.timer++;
             this.updateTimer();
         }, 1000);
+
+        // Show pause button when timer starts
+        const pauseBtn = document.getElementById('pause-game');
+        pauseBtn.style.display = 'flex';
     }
 
     stopTimer() {
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
+            this.timerInterval = null;
         }
+
+        // Hide pause button when timer stops
+        const pauseBtn = document.getElementById('pause-game');
+        pauseBtn.style.display = 'none';
     }
 
     updateTimer() {
@@ -930,6 +984,13 @@ class Minesweeper {
         this.timer = 0;
         this.flagsCount = 0;
         this.revealedCount = 0;
+        this.isPaused = false;
+
+        // Hide pause overlay if visible
+        const overlay = document.getElementById('pause-overlay');
+        const board = document.getElementById('game-board');
+        overlay.style.display = 'none';
+        board.classList.remove('paused');
 
         document.getElementById('status-message').className = 'status-message';
 

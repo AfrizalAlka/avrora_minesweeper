@@ -1104,3 +1104,144 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
     background: var(--dark-secondary);
 }
+
+/* ============================================
+   PAUSE OVERLAY
+   ============================================ */
+
+.pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+body.dark-mode .pause-overlay {
+    background: rgba(0, 0, 0, 0.92);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.pause-content {
+    text-align: center;
+    color: white;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pause-icon {
+    font-size: 5rem;
+    color: white;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+    filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+}
+
+.pause-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: 4px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.pause-text {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.btn-resume {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 800;
+    padding: 1rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-resume:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.6);
+}
+
+.btn-resume:active {
+    transform: scale(0.98);
+}
+
+body.dark-mode .btn-resume {
+    background: linear-gradient(135deg, var(--dark-primary), var(--dark-secondary));
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+body.dark-mode .btn-resume:hover {
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.6);
+}
+
+.game-board.paused {
+    filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+}
+
+#pause-game {
+    transition: all 0.3s ease;
+}
+
+#pause-game i {
+    transition: transform 0.3s ease;
+}
+
+#pause-game:hover i {
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .pause-title {
+        font-size: 2rem;
+        letter-spacing: 2px;
+    }
+
+    .pause-icon {
+        font-size: 4rem;
+    }
+
+    .btn-resume {
+        font-size: 1.1rem;
+        padding: 0.875rem 2rem;
+    }
+}

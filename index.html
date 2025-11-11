@@ -39,6 +39,9 @@
                     <button class="btn btn-icon" id="show-leaderboard" title="Leaderboard">
                         <i class="bi bi-trophy-fill"></i>
                     </button>
+                    <button class="btn btn-icon" id="pause-game" title="Pause Game" style="display: none;">
+                        <i class="bi bi-pause-circle-fill"></i>
+                    </button>
                 </div>
             </div>
 
@@ -126,7 +129,21 @@
                 </button>
 
                 <!-- Game Board -->
-                <div id="game-board" class="game-board mx-auto"></div>
+                <div id="game-board-container" style="position: relative;">
+                    <div id="game-board" class="game-board mx-auto"></div>
+
+                    <!-- Pause Overlay -->
+                    <div id="pause-overlay" class="pause-overlay" style="display: none;">
+                        <div class="pause-content">
+                            <i class="bi bi-pause-circle-fill pause-icon"></i>
+                            <h2 class="pause-title">GAME PAUSED</h2>
+                            <p class="pause-text">Klik Resume untuk melanjutkan</p>
+                            <button class="btn btn-resume" id="resume-game">
+                                <i class="bi bi-play-circle-fill"></i> Resume
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Status Message -->
                 <div class="alert alert-dismissible fade" id="status-message" role="alert"></div>

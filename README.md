@@ -98,11 +98,12 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 
 ### Tombol Kontrol Header
 - **ðŸŽ² GAME BARU**: Mulai permainan baru (konfirmasi jika game berjalan)
-- **ðŸŒ— Dark Mode**: Toggle tema gelap/terang (icon berubah: ðŸŒ™/â˜€ï¸)
-- **ðŸ”Š Sound**: Toggle sound effect (icon berubah: ðŸ”Š/ðŸ”‡)
-- **ðŸ’¾ Save**: Simpan permainan saat ini (floppy disk icon)
-- **ðŸ“‚ Load**: Muat permainan tersimpan (folder icon)
-- **ðŸ† Leaderboard**: Lihat ranking waktu terbaik
+- **ðŸŒ— Dark Mode**: Toggle tema gelap/terang (icon berubah: ðŸŒ™/â˜€ï¸)
+- **ðŸ"Š Sound**: Toggle sound effect (icon berubah: ðŸ"Š/ðŸ"‡)
+- **ðŸ'¾ Save**: Simpan permainan saat ini (floppy disk icon)
+- **ðŸ"‚ Load**: Muat permainan tersimpan (folder icon)
+- **ðŸ† Leaderboard**: Lihat ranking waktu terbaik
+- **⏯️ Pause**: Jeda permainan (hanya muncul saat game berjalan)
 
 ### Tips & Trik
 - Mulai dari pojok atau tepi untuk area yang lebih aman
@@ -234,9 +235,22 @@ avrora_minesweeper/
 - âœ… Edge 90+
 - âœ… Mobile browsers (iOS Safari, Chrome Mobile)
 
-## ðŸ”„ Update Log
+## ðŸ"„ Update Log
 
-### Version 1.4 (Current - Bootstrap Edition) 🎉
+### Version 1.5 (Current - Power User Edition) 🎮
+- ⏯️ **Pause/Resume Game**: Jeda permainan kapan saja
+  - Tombol pause dinamis (hanya muncul saat game berjalan)
+  - Timer otomatis berhenti saat pause
+  - Board di-blur dengan overlay "PAUSED"
+  - Tombol Resume besar di tengah overlay
+  - Animasi smooth fadeIn & slideUp
+  - Sound effect untuk pause/resume
+  - Prevent interaksi board saat pause
+  - Auto-hide pause button saat game over
+- 🎨 **Enhanced UX**: Better game flow control
+- 🐛 **Bug Prevention**: Tidak bisa click board saat pause
+
+### Version 1.4 (Bootstrap Edition) 🎉
 - ✨ **Bootstrap 5.3.3 Migration**: Complete UI overhaul
 - 🎨 **Modern Design System**: Glassmorphism + gradient backgrounds
 - 🌈 **Background Cross-fade**: Smooth 0.6s transition antara light/dark mode
