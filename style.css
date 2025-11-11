@@ -1106,6 +1106,128 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
 }
 
 /* ============================================
+   HINT SYSTEM
+   ============================================ */
+
+#hint-btn {
+    position: relative;
+}
+
+.hint-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+}
+
+body.dark-mode .hint-badge {
+    border-color: var(--dark-bg);
+}
+
+#hint-btn.disabled {
+    pointer-events: none;
+}
+
+#hint-btn:not(.disabled):hover i {
+    transform: scale(1.3) rotate(20deg);
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8));
+}
+
+#hint-btn i {
+    transition: all 0.3s ease;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.hint-highlight {
+    animation: hintPulse 3s ease-in-out;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.8),
+        0 0 20px rgba(245, 158, 11, 0.6),
+        0 0 40px rgba(245, 158, 11, 0.4) !important;
+    z-index: 100;
+    position: relative;
+}
+
+@keyframes hintPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.8),
+            0 0 20px rgba(245, 158, 11, 0.6),
+            0 0 40px rgba(245, 158, 11, 0.4);
+        transform: scale(1);
+    }
+
+    25% {
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 1),
+            0 0 30px rgba(245, 158, 11, 0.8),
+            0 0 60px rgba(245, 158, 11, 0.6);
+        transform: scale(1.1);
+    }
+
+    50% {
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.8),
+            0 0 20px rgba(245, 158, 11, 0.6),
+            0 0 40px rgba(245, 158, 11, 0.4);
+        transform: scale(1);
+    }
+
+    75% {
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 1),
+            0 0 30px rgba(245, 158, 11, 0.8),
+            0 0 60px rgba(245, 158, 11, 0.6);
+        transform: scale(1.1);
+    }
+}
+
+#hint-info {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#hint-info.alert-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+    color: white;
+}
+
+#hint-info.alert-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95));
+    color: white;
+}
+
+#hint-info.alert-info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95));
+    color: white;
+}
+
+body.dark-mode #hint-info {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+#hint-info .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+#hint-info .btn-close:hover {
+    opacity: 1;
+}
+
+/* ============================================
    PAUSE OVERLAY
    ============================================ */
 

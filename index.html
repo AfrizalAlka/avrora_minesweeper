@@ -42,6 +42,10 @@
                     <button class="btn btn-icon" id="pause-game" title="Pause Game" style="display: none;">
                         <i class="bi bi-pause-circle-fill"></i>
                     </button>
+                    <button class="btn btn-icon" id="hint-btn" title="Hint (Max 3)" style="display: none;">
+                        <i class="bi bi-lightbulb-fill"></i>
+                        <span class="hint-badge" id="hint-count">3</span>
+                    </button>
                 </div>
             </div>
 
@@ -72,6 +76,14 @@
                             <div class="info-value" id="best-score">-</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Hint Info Alert -->
+                <div class="alert alert-warning alert-dismissible fade" id="hint-info" role="alert"
+                    style="display: none;">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <span id="hint-message"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
                 <!-- Info Hint -->
