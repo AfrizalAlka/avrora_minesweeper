@@ -104,6 +104,7 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 - **ðŸ"‚ Load**: Muat permainan tersimpan (folder icon)
 - **ðŸ† Leaderboard**: Lihat ranking waktu terbaik
 - **⏯️ Pause**: Jeda permainan (hanya muncul saat game berjalan)
+- **💡 Hint**: Bantuan pemula - highlight 1 sel aman (Max 3x, disable best score)
 
 ### Tips & Trik
 - Mulai dari pojok atau tepi untuk area yang lebih aman
@@ -114,8 +115,10 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 - Perhatikan pola angka untuk deduksi logis
 - Save game Anda sebelum mencoba area berisiko tinggi!
 - Hover pada angka untuk melihat glow effect (indikasi bisa di-chord)
+- **💡 Gunakan hint dengan bijak** - best score tidak akan tercatat jika pakai hint!
+- Hint berguna untuk pemula yang belajar pola permainan
 
-## ðŸŽ² Level Kesulitan
+## 🎲 Level Kesulitan
 
 | Level | Ukuran Grid | Jumlah Bom | Kesulitan |
 |-------|-------------|------------|-----------|

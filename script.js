@@ -12,6 +12,8 @@ class Minesweeper {
         this.timerInterval = null;
         this.currentLevel = 'easy';
         this.isPaused = false;
+        this.hintsRemaining = 3;
+        this.hintsUsed = false;
 
         // Sound settings
         this.soundEnabled = this.loadSetting('soundEnabled', true);
@@ -343,6 +345,12 @@ class Minesweeper {
     }
 
     updateBestScore() {
+        // Don't update best score if hints were used
+        if (this.hintsUsed) {
+            this.displayBestScore();
+            return;
+        }
+
         const currentBest = this.bestScores[this.currentLevel];
         if (currentBest === null || this.timer < currentBest) {
             this.bestScores[this.currentLevel] = this.timer;
@@ -417,6 +425,7 @@ class Minesweeper {
         document.getElementById('show-leaderboard').addEventListener('click', () => this.showLeaderboard());
         document.getElementById('pause-game').addEventListener('click', () => this.pauseGame());
         document.getElementById('resume-game').addEventListener('click', () => this.resumeGame());
+        document.getElementById('hint-btn').addEventListener('click', () => this.useHint());
 
         // Leaderboard tabs - use Bootstrap nav-link
         document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(link => {
@@ -815,13 +824,13 @@ class Minesweeper {
             this.playSound('win');
             this.updateBestScore();
 
-            // Add to leaderboard for preset difficulties
-            if (['easy', 'medium', 'hard'].includes(this.currentLevel)) {
+            // Add to leaderboard for preset difficulties (only if no hints used)
+            if (['easy', 'medium', 'hard'].includes(this.currentLevel) && !this.hintsUsed) {
                 this.addToLeaderboard(this.currentLevel, this.timer);
             }
 
             const bestScore = this.bestScores[this.currentLevel];
-            const isNewRecord = this.timer === bestScore;
+            const isNewRecord = !this.hintsUsed && this.timer === bestScore;
 
             // Show win modal
             this.showResultModal(true, isNewRecord);
@@ -847,8 +856,15 @@ class Minesweeper {
             modalContent.classList.add('win');
             modalTitle.innerHTML = '<i class="bi bi-trophy-fill"></i> KEMENANGAN!';
             resultIcon.textContent = '🎉';
-            resultMessage.textContent = isNewRecord ? '🏆 REKOR BARU!' : 'Selamat! Anda Menang!';
 
+            // Show different message if hints were used
+            if (this.hintsUsed) {
+                resultMessage.textContent = 'Selamat! Anda Menang! (Hint digunakan)';
+            } else {
+                resultMessage.textContent = isNewRecord ? '🏆 REKOR BARU!' : 'Selamat! Anda Menang!';
+            }
+
+            const hintsUsedCount = 3 - this.hintsRemaining;
             resultStats.innerHTML = `
                 <div class="result-stat-item">
                     <div class="result-stat-label">⏱️ Waktu</div>
@@ -857,6 +873,10 @@ class Minesweeper {
                 <div class="result-stat-item">
                     <div class="result-stat-label">💣 Bom</div>
                     <div class="result-stat-value">${this.minesCount}</div>
+                </div>
+                <div class="result-stat-item">
+                    <div class="result-stat-label">💡 Hints</div>
+                    <div class="result-stat-value">${hintsUsedCount}/3</div>
                 </div>
                 <div class="result-stat-item">
                     <div class="result-stat-label">🏆 Best</div>
@@ -943,15 +963,116 @@ class Minesweeper {
         this.playSound('click');
     }
 
+    useHint() {
+        if (this.hintsRemaining <= 0 || this.gameOver || !this.gameStarted || this.isPaused) {
+            if (this.hintsRemaining <= 0) {
+                this.showHintMessage('Hint sudah habis! (Max 3 per game)', 'warning');
+            }
+            return;
+        }
+
+        // Find all safe unrevealed cells
+        const safeCells = [];
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                const cell = this.board[i][j];
+                if (!cell.mine && !cell.revealed && !cell.flagged) {
+                    safeCells.push({ row: i, col: j });
+                }
+            }
+        }
+
+        if (safeCells.length === 0) {
+            this.showHintMessage('Tidak ada sel aman yang bisa di-hint!', 'info');
+            return;
+        }
+
+        // Pick random safe cell
+        const randomIndex = Math.floor(Math.random() * safeCells.length);
+        const hintCell = safeCells[randomIndex];
+
+        // Highlight the cell
+        const cellElement = document.querySelector(`[data-row="${hintCell.row}"][data-col="${hintCell.col}"]`);
+        cellElement.classList.add('hint-highlight');
+
+        // Remove highlight after animation
+        setTimeout(() => {
+            cellElement.classList.remove('hint-highlight');
+        }, 3000);
+
+        // Update hint count
+        this.hintsRemaining--;
+        this.hintsUsed = true;
+        this.updateHintButton();
+
+        // Show message
+        this.showHintMessage(`💡 Hint: Sel di baris ${hintCell.row + 1}, kolom ${hintCell.col + 1} aman! (${this.hintsRemaining} tersisa)`, 'success');
+
+        // Play sound
+        this.playSound('reveal');
+    }
+
+    updateHintButton() {
+        const hintBtn = document.getElementById('hint-btn');
+        const hintCount = document.getElementById('hint-count');
+
+        hintCount.textContent = this.hintsRemaining;
+
+        if (this.hintsRemaining <= 0) {
+            hintBtn.classList.add('disabled');
+            hintBtn.style.opacity = '0.5';
+            hintBtn.style.cursor = 'not-allowed';
+        } else {
+            hintBtn.classList.remove('disabled');
+            hintBtn.style.opacity = '1';
+            hintBtn.style.cursor = 'pointer';
+        }
+    }
+
+    showHintMessage(message, type = 'info') {
+        const hintInfo = document.getElementById('hint-info');
+        const hintMessage = document.getElementById('hint-message');
+
+        hintMessage.textContent = message;
+
+        // Remove previous type classes
+        hintInfo.classList.remove('alert-success', 'alert-warning', 'alert-info', 'alert-danger');
+
+        // Add new type class
+        if (type === 'success') {
+            hintInfo.classList.add('alert-success');
+        } else if (type === 'warning') {
+            hintInfo.classList.add('alert-warning');
+        } else if (type === 'danger') {
+            hintInfo.classList.add('alert-danger');
+        } else {
+            hintInfo.classList.add('alert-info');
+        }
+
+        hintInfo.style.display = 'block';
+        hintInfo.classList.add('show');
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            hintInfo.classList.remove('show');
+            setTimeout(() => {
+                hintInfo.style.display = 'none';
+            }, 150);
+        }, 5000);
+    }
+
     startTimer() {
         this.timerInterval = setInterval(() => {
             this.timer++;
             this.updateTimer();
         }, 1000);
 
-        // Show pause button when timer starts
+        // Show pause and hint buttons when timer starts
         const pauseBtn = document.getElementById('pause-game');
+        const hintBtn = document.getElementById('hint-btn');
         pauseBtn.style.display = 'flex';
+        hintBtn.style.display = 'flex';
+        this.updateHintButton();
     }
 
     stopTimer() {
@@ -960,9 +1081,11 @@ class Minesweeper {
             this.timerInterval = null;
         }
 
-        // Hide pause button when timer stops
+        // Hide pause and hint buttons when timer stops
         const pauseBtn = document.getElementById('pause-game');
+        const hintBtn = document.getElementById('hint-btn');
         pauseBtn.style.display = 'none';
+        hintBtn.style.display = 'none';
     }
 
     updateTimer() {
@@ -985,6 +1108,8 @@ class Minesweeper {
         this.flagsCount = 0;
         this.revealedCount = 0;
         this.isPaused = false;
+        this.hintsRemaining = 3;
+        this.hintsUsed = false;
 
         // Hide pause overlay if visible
         const overlay = document.getElementById('pause-overlay');
@@ -992,9 +1117,15 @@ class Minesweeper {
         overlay.style.display = 'none';
         board.classList.remove('paused');
 
+        // Hide hint info
+        const hintInfo = document.getElementById('hint-info');
+        hintInfo.style.display = 'none';
+        hintInfo.classList.remove('show');
+
         document.getElementById('status-message').className = 'status-message';
 
         this.createBoard();
+        this.updateHintButton();
     }
 }
 
