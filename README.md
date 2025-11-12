@@ -117,6 +117,26 @@ Game Minesweeper klasik yang dibuat dengan HTML, CSS, dan JavaScript modern. Dil
 - Hover pada angka untuk melihat glow effect (indikasi bisa di-chord)
 - **💡 Gunakan hint dengan bijak** - best score tidak akan tercatat jika pakai hint!
 - Hint berguna untuk pemula yang belajar pola permainan
+- **⌨️ Gunakan keyboard shortcuts** untuk akses cepat - tekan `?` untuk melihat daftar lengkap
+
+## ⌨️ Keyboard Shortcuts
+
+Kontrol game lebih cepat dengan keyboard:
+
+| Key | Function | Description |
+|-----|----------|-------------|
+| **N** / **R** | New Game / Restart | Mulai permainan baru |
+| **S** | Save | Simpan permainan saat ini |
+| **L** | Load | Muat permainan tersimpan |
+| **H** | Hint | Gunakan hint (max 3x) |
+| **Space** | Pause / Resume | Jeda atau lanjutkan permainan |
+| **D** | Dark Mode | Toggle tema gelap/terang |
+| **M** | Mute | Toggle sound on/off |
+| **B** | Board | Tampilkan leaderboard |
+| **ESC** | Close / Resume | Tutup modal atau resume |
+| **?** | Help | Tampilkan bantuan keyboard shortcuts |
+
+> 💡 **Tip**: Tekan `?` kapan saja untuk melihat daftar keyboard shortcuts dalam modal interaktif!
 
 ## 🎲 Level Kesulitan
 
