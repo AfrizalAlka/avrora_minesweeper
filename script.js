@@ -366,6 +366,7 @@ class Minesweeper {
 
     init() {
         this.setupEventListeners();
+        this.setupKeyboardShortcuts();
         this.createBoard();
 
         // Apply dark mode if enabled
@@ -376,6 +377,162 @@ class Minesweeper {
 
         // Update sound button icon
         this.updateSoundIcon();
+    }
+
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ignore if typing in input field
+            if (e.target.tagName === 'INPUT') {
+                return;
+            }
+
+            // Ignore if modal is open (except for ESC)
+            const modalOpen = document.querySelector('.modal.show');
+            if (modalOpen && e.key !== 'Escape') {
+                return;
+            }
+
+            const key = e.key.toLowerCase();
+
+            switch (key) {
+                case 'n':
+                    e.preventDefault();
+                    this.handleNewGame();
+                    this.showToast('⌨️ Keyboard: New Game (N)', 'info');
+                    break;
+
+                case 'r':
+                    e.preventDefault();
+                    this.handleNewGame();
+                    this.showToast('⌨️ Keyboard: Restart (R)', 'info');
+                    break;
+
+                case 's':
+                    e.preventDefault();
+                    this.saveGame();
+                    break;
+
+                case 'l':
+                    e.preventDefault();
+                    this.loadGame();
+                    break;
+
+                case 'h':
+                    e.preventDefault();
+                    if (this.gameStarted && !this.gameOver) {
+                        this.useHint();
+                    }
+                    break;
+
+                case ' ':
+                    e.preventDefault();
+                    if (this.isPaused) {
+                        this.resumeGame();
+                        this.showToast('⌨️ Keyboard: Resume (Space)', 'info');
+                    } else if (this.gameStarted && !this.gameOver) {
+                        this.pauseGame();
+                        this.showToast('⌨️ Keyboard: Pause (Space)', 'info');
+                    }
+                    break;
+
+                case 'escape':
+                    // Close any open modal
+                    if (modalOpen) {
+                        const modal = bootstrap.Modal.getInstance(modalOpen);
+                        if (modal) modal.hide();
+                    }
+                    // Or resume if paused
+                    else if (this.isPaused) {
+                        this.resumeGame();
+                        this.showToast('⌨️ Keyboard: Resume (ESC)', 'info');
+                    }
+                    break;
+
+                case 'd':
+                    e.preventDefault();
+                    this.toggleDarkMode();
+                    break;
+
+                case 'm':
+                    e.preventDefault();
+                    this.toggleSound();
+                    break;
+
+                case 'b':
+                    e.preventDefault();
+                    this.showLeaderboard();
+                    this.showToast('⌨️ Keyboard: Leaderboard (B)', 'info');
+                    break;
+
+                case '?':
+                    e.preventDefault();
+                    this.showKeyboardHelp();
+                    break;
+            }
+        });
+    }
+
+    async handleNewGame() {
+        // Validasi jika game sedang berjalan
+        if (this.gameStarted && !this.gameOver) {
+            const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda mulai game baru. Lanjutkan?');
+            if (!confirmed) {
+                return;
+            }
+        }
+        this.resetGame();
+    }
+
+    showKeyboardHelp() {
+        const helpMessage = `
+            <div style="text-align: left;">
+                <h5 class="mb-3"><i class="bi bi-keyboard"></i> Keyboard Shortcuts</h5>
+                <table class="table table-sm table-borderless" style="font-size: 0.9rem;">
+                    <tbody>
+                        <tr><td><kbd>N</kbd> / <kbd>R</kbd></td><td>New Game / Restart</td></tr>
+                        <tr><td><kbd>S</kbd></td><td>Save Game</td></tr>
+                        <tr><td><kbd>L</kbd></td><td>Load Game</td></tr>
+                        <tr><td><kbd>H</kbd></td><td>Use Hint</td></tr>
+                        <tr><td><kbd>Space</kbd></td><td>Pause / Resume</td></tr>
+                        <tr><td><kbd>D</kbd></td><td>Toggle Dark Mode</td></tr>
+                        <tr><td><kbd>M</kbd></td><td>Toggle Sound</td></tr>
+                        <tr><td><kbd>B</kbd></td><td>Show Leaderboard</td></tr>
+                        <tr><td><kbd>ESC</kbd></td><td>Close Modal / Resume</td></tr>
+                        <tr><td><kbd>?</kbd></td><td>Show This Help</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        const modal = document.getElementById('confirm-modal');
+        const messageEl = document.getElementById('confirm-message');
+        const okBtn = document.getElementById('confirm-ok-btn');
+        const titleEl = modal.querySelector('.modal-title');
+
+        // Backup original title
+        const originalTitle = titleEl.innerHTML;
+
+        // Set help content
+        titleEl.innerHTML = '<i class="bi bi-keyboard-fill text-primary me-2"></i> Keyboard Shortcuts';
+        messageEl.innerHTML = helpMessage;
+        okBtn.textContent = 'Got it!';
+
+        // Show modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+
+        // Handle close
+        const handleClose = () => {
+            titleEl.innerHTML = originalTitle;
+            okBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Lanjutkan';
+            modal.removeEventListener('hidden.bs.modal', handleClose);
+        };
+
+        okBtn.addEventListener('click', () => {
+            bsModal.hide();
+        }, { once: true });
+
+        modal.addEventListener('hidden.bs.modal', handleClose);
     }
 
     updateDarkModeIcon() {
@@ -399,16 +556,7 @@ class Minesweeper {
     }
 
     setupEventListeners() {
-        document.getElementById('new-game').addEventListener('click', async () => {
-            // Validasi jika game sedang berjalan
-            if (this.gameStarted && !this.gameOver) {
-                const confirmed = await this.showConfirm('Game sedang berjalan! Progress akan hilang jika Anda mulai game baru. Lanjutkan?');
-                if (!confirmed) {
-                    return;
-                }
-            }
-            this.resetGame();
-        });
+        document.getElementById('new-game').addEventListener('click', () => this.handleNewGame());
 
         // Play again button in result modal
         document.getElementById('play-again-btn').addEventListener('click', () => {

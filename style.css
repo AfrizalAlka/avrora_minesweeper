@@ -1228,6 +1228,44 @@ body.dark-mode #hint-info {
 }
 
 /* ============================================
+   KEYBOARD SHORTCUTS
+   ============================================ */
+
+kbd {
+    display: inline-block;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 0.375rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-family: 'Courier New', monospace;
+    min-width: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode kbd {
+    background: linear-gradient(135deg, var(--dark-primary), var(--dark-secondary));
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.table-borderless td {
+    padding: 0.4rem 0.8rem;
+}
+
+.table-borderless td:first-child {
+    font-weight: 600;
+    width: 40%;
+}
+
+body.dark-mode .table {
+    color: var(--dark-text);
+}
+
+/* ============================================
    PAUSE OVERLAY
    ============================================ */
 
