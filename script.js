@@ -15,6 +15,12 @@ class Minesweeper {
         this.hintsRemaining = 3;
         this.hintsUsed = false;
 
+        // Undo/Redo system
+        this.moveHistory = [];
+        this.redoStack = [];
+        this.maxUndoMoves = 3;
+        this.undoUsed = false;
+
         // Sound settings
         this.soundEnabled = this.loadSetting('soundEnabled', true);
 
@@ -345,8 +351,8 @@ class Minesweeper {
     }
 
     updateBestScore() {
-        // Don't update best score if hints were used
-        if (this.hintsUsed) {
+        // Don't update best score if hints or undo were used
+        if (this.hintsUsed || this.undoUsed) {
             this.displayBestScore();
             return;
         }
@@ -424,6 +430,20 @@ class Minesweeper {
                     }
                     break;
 
+                case 'u':
+                    e.preventDefault();
+                    if (this.gameStarted && !this.gameOver) {
+                        this.undoMove();
+                    }
+                    break;
+
+                case 'y':
+                    e.preventDefault();
+                    if (this.gameStarted && !this.gameOver) {
+                        this.redoMove();
+                    }
+                    break;
+
                 case ' ':
                     e.preventDefault();
                     if (this.isPaused) {
@@ -493,6 +513,8 @@ class Minesweeper {
                         <tr><td><kbd>S</kbd></td><td>Save Game</td></tr>
                         <tr><td><kbd>L</kbd></td><td>Load Game</td></tr>
                         <tr><td><kbd>H</kbd></td><td>Use Hint</td></tr>
+                        <tr><td><kbd>U</kbd></td><td>Undo Move (Max 3)</td></tr>
+                        <tr><td><kbd>Y</kbd></td><td>Redo Move</td></tr>
                         <tr><td><kbd>Space</kbd></td><td>Pause / Resume</td></tr>
                         <tr><td><kbd>D</kbd></td><td>Toggle Dark Mode</td></tr>
                         <tr><td><kbd>M</kbd></td><td>Toggle Sound</td></tr>
@@ -574,6 +596,8 @@ class Minesweeper {
         document.getElementById('pause-game').addEventListener('click', () => this.pauseGame());
         document.getElementById('resume-game').addEventListener('click', () => this.resumeGame());
         document.getElementById('hint-btn').addEventListener('click', () => this.useHint());
+        document.getElementById('undo-btn').addEventListener('click', () => this.undoMove());
+        document.getElementById('redo-btn').addEventListener('click', () => this.redoMove());
 
         // Leaderboard tabs - use Bootstrap nav-link
         document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(link => {
@@ -802,6 +826,9 @@ class Minesweeper {
             this.startTimer();
         }
 
+        // Save state before revealing (only for single cell reveals, not chord)
+        this.saveStateForUndo('reveal', { row, col });
+
         this.revealCell(row, col, true); // true = initial click, play sound
     }
 
@@ -926,6 +953,12 @@ class Minesweeper {
         const cell = this.board[row][col];
         const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
 
+        // Save state before flag change
+        const oldState = {
+            flagged: cell.flagged,
+            questioned: cell.questioned
+        };
+
         // Cycle: Empty → Flag → Question → Empty
         if (cell.flagged) {
             // Flag → Question
@@ -951,6 +984,9 @@ class Minesweeper {
             this.flagsCount++;
         }
 
+        // Save state for undo
+        this.saveStateForUndo('flag', { row, col, oldState, newState: { flagged: cell.flagged, questioned: cell.questioned } });
+
         this.updateFlagsCount();
     }
 
@@ -972,13 +1008,13 @@ class Minesweeper {
             this.playSound('win');
             this.updateBestScore();
 
-            // Add to leaderboard for preset difficulties (only if no hints used)
-            if (['easy', 'medium', 'hard'].includes(this.currentLevel) && !this.hintsUsed) {
+            // Add to leaderboard for preset difficulties (only if no hints/undo used)
+            if (['easy', 'medium', 'hard'].includes(this.currentLevel) && !this.hintsUsed && !this.undoUsed) {
                 this.addToLeaderboard(this.currentLevel, this.timer);
             }
 
             const bestScore = this.bestScores[this.currentLevel];
-            const isNewRecord = !this.hintsUsed && this.timer === bestScore;
+            const isNewRecord = !this.hintsUsed && !this.undoUsed && this.timer === bestScore;
 
             // Show win modal
             this.showResultModal(true, isNewRecord);
@@ -1005,14 +1041,18 @@ class Minesweeper {
             modalTitle.innerHTML = '<i class="bi bi-trophy-fill"></i> KEMENANGAN!';
             resultIcon.textContent = '🎉';
 
-            // Show different message if hints were used
-            if (this.hintsUsed) {
-                resultMessage.textContent = 'Selamat! Anda Menang! (Hint digunakan)';
+            // Show different message if hints or undo were used
+            if (this.hintsUsed || this.undoUsed) {
+                const assists = [];
+                if (this.hintsUsed) assists.push('Hint');
+                if (this.undoUsed) assists.push('Undo');
+                resultMessage.textContent = `Selamat! Anda Menang! (${assists.join(' & ')} digunakan)`;
             } else {
                 resultMessage.textContent = isNewRecord ? '🏆 REKOR BARU!' : 'Selamat! Anda Menang!';
             }
 
             const hintsUsedCount = 3 - this.hintsRemaining;
+            const undosUsedCount = this.maxUndoMoves - this.moveHistory.length;
             resultStats.innerHTML = `
                 <div class="result-stat-item">
                     <div class="result-stat-label">⏱️ Waktu</div>
@@ -1027,12 +1067,14 @@ class Minesweeper {
                     <div class="result-stat-value">${hintsUsedCount}/3</div>
                 </div>
                 <div class="result-stat-item">
+                    <div class="result-stat-label">🔁 Undos</div>
+                    <div class="result-stat-value">${undosUsedCount}/3</div>
+                </div>
+                <div class="result-stat-item">
                     <div class="result-stat-label">🏆 Best</div>
                     <div class="result-stat-value">${this.bestScores[this.currentLevel] || '-'}</div>
                 </div>
-            `;
-
-            this.playSound('win');
+            `; this.playSound('win');
         } else {
             modalContent.classList.add('lose');
             modalTitle.innerHTML = '<i class="bi bi-x-circle-fill"></i> GAME OVER';
@@ -1109,6 +1151,170 @@ class Minesweeper {
         pauseBtn.style.display = 'flex';
 
         this.playSound('click');
+    }
+
+    saveStateForUndo(action, data) {
+        // Don't save if game is over
+        if (this.gameOver) return;
+
+        // Create deep copy of current board state
+        const boardCopy = JSON.parse(JSON.stringify(this.board));
+
+        const state = {
+            action: action,
+            data: data,
+            board: boardCopy,
+            flagsCount: this.flagsCount,
+            revealedCount: this.revealedCount,
+            timestamp: Date.now()
+        };
+
+        this.moveHistory.push(state);
+
+        // Limit history to max undo moves
+        if (this.moveHistory.length > this.maxUndoMoves) {
+            this.moveHistory.shift();
+        }
+
+        // Clear redo stack when new move is made
+        this.redoStack = [];
+
+        this.updateUndoRedoButtons();
+    }
+
+    undoMove() {
+        if (this.moveHistory.length === 0 || this.gameOver || this.isPaused) {
+            return;
+        }
+
+        // Get last state
+        const lastState = this.moveHistory.pop();
+
+        // Save current state to redo stack
+        const currentState = {
+            action: lastState.action,
+            data: lastState.data,
+            board: JSON.parse(JSON.stringify(this.board)),
+            flagsCount: this.flagsCount,
+            revealedCount: this.revealedCount
+        };
+        this.redoStack.push(currentState);
+
+        // Restore previous state
+        this.board = JSON.parse(JSON.stringify(lastState.board));
+        this.flagsCount = lastState.flagsCount;
+        this.revealedCount = lastState.revealedCount;
+        this.undoUsed = true;
+
+        // Re-render board
+        this.renderBoardFromState();
+
+        // Update UI
+        this.updateFlagsCount();
+        this.updateUndoRedoButtons();
+
+        this.playSound('click');
+        this.showToast(`🔙 Undo: ${this.moveHistory.length} moves tersisa`, 'info');
+    }
+
+    redoMove() {
+        if (this.redoStack.length === 0 || this.gameOver || this.isPaused) {
+            return;
+        }
+
+        // Get last redo state
+        const redoState = this.redoStack.pop();
+
+        // Save current state to history
+        const currentState = {
+            action: redoState.action,
+            data: redoState.data,
+            board: JSON.parse(JSON.stringify(this.board)),
+            flagsCount: this.flagsCount,
+            revealedCount: this.revealedCount
+        };
+        this.moveHistory.push(currentState);
+
+        // Restore redo state
+        this.board = JSON.parse(JSON.stringify(redoState.board));
+        this.flagsCount = redoState.flagsCount;
+        this.revealedCount = redoState.revealedCount;
+
+        // Re-render board
+        this.renderBoardFromState();
+
+        // Update UI
+        this.updateFlagsCount();
+        this.updateUndoRedoButtons();
+
+        this.playSound('click');
+        this.showToast('🔃 Redo applied', 'info');
+    }
+
+    renderBoardFromState() {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                const cell = this.board[i][j];
+                const cellElement = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+
+                // Clear all classes
+                cellElement.className = 'cell';
+                cellElement.textContent = '';
+
+                // Apply revealed state
+                if (cell.revealed) {
+                    cellElement.classList.add('revealed');
+                    if (cell.mine) {
+                        cellElement.classList.add('mine');
+                        cellElement.textContent = '💣';
+                    } else if (cell.adjacentMines > 0) {
+                        cellElement.textContent = cell.adjacentMines;
+                        cellElement.classList.add(`number-${cell.adjacentMines}`);
+                    }
+                }
+
+                // Apply flagged state
+                if (cell.flagged) {
+                    cellElement.classList.add('flagged');
+                    cellElement.textContent = '🚩';
+                }
+
+                // Apply questioned state
+                if (cell.questioned) {
+                    cellElement.classList.add('questioned');
+                    cellElement.textContent = '❓';
+                }
+            }
+        }
+    }
+
+    updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        const undoCount = document.getElementById('undo-count');
+
+        // Update undo button
+        undoCount.textContent = this.moveHistory.length;
+        undoBtn.disabled = this.moveHistory.length === 0;
+
+        if (this.moveHistory.length === 0) {
+            undoBtn.style.opacity = '0.5';
+            undoBtn.style.cursor = 'not-allowed';
+        } else {
+            undoBtn.style.opacity = '1';
+            undoBtn.style.cursor = 'pointer';
+        }
+
+        // Update redo button
+        redoBtn.disabled = this.redoStack.length === 0;
+
+        if (this.redoStack.length === 0) {
+            redoBtn.style.opacity = '0.5';
+            redoBtn.style.cursor = 'not-allowed';
+        } else {
+            redoBtn.style.opacity = '1';
+            redoBtn.style.cursor = 'pointer';
+        }
     }
 
     useHint() {
@@ -1215,12 +1421,17 @@ class Minesweeper {
             this.updateTimer();
         }, 1000);
 
-        // Show pause and hint buttons when timer starts
+        // Show pause, hint, and undo/redo buttons when timer starts
         const pauseBtn = document.getElementById('pause-game');
         const hintBtn = document.getElementById('hint-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
         pauseBtn.style.display = 'flex';
         hintBtn.style.display = 'flex';
+        undoBtn.style.display = 'flex';
+        redoBtn.style.display = 'flex';
         this.updateHintButton();
+        this.updateUndoRedoButtons();
     }
 
     stopTimer() {
@@ -1229,11 +1440,15 @@ class Minesweeper {
             this.timerInterval = null;
         }
 
-        // Hide pause and hint buttons when timer stops
+        // Hide pause, hint, and undo/redo buttons when timer stops
         const pauseBtn = document.getElementById('pause-game');
         const hintBtn = document.getElementById('hint-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
         pauseBtn.style.display = 'none';
         hintBtn.style.display = 'none';
+        undoBtn.style.display = 'none';
+        redoBtn.style.display = 'none';
     }
 
     updateTimer() {
@@ -1258,6 +1473,9 @@ class Minesweeper {
         this.isPaused = false;
         this.hintsRemaining = 3;
         this.hintsUsed = false;
+        this.moveHistory = [];
+        this.redoStack = [];
+        this.undoUsed = false;
 
         // Hide pause overlay if visible
         const overlay = document.getElementById('pause-overlay');
@@ -1274,6 +1492,7 @@ class Minesweeper {
 
         this.createBoard();
         this.updateHintButton();
+        this.updateUndoRedoButtons();
     }
 }
 
