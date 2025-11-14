@@ -39,8 +39,11 @@
                     <button class="btn btn-icon" id="show-leaderboard" title="Leaderboard">
                         <i class="bi bi-trophy-fill"></i>
                     </button>
+                    <button class="btn btn-icon" id="settings-btn" title="Settings">
+                        <i class="bi bi-gear-fill"></i>
+                    </button>
                     <button class="btn btn-icon" id="pause-game" title="Pause Game" style="display: none;">
-                        <i class="bi bi-pause-circle-fill"></i>
+                        <i class="bi bi-pause-fill"></i>
                     </button>
                     <button class="btn btn-icon" id="hint-btn" title="Hint (Max 3)" style="display: none;">
                         <i class="bi bi-lightbulb-fill"></i>
@@ -221,6 +224,76 @@
                         </li>
                     </ul>
                     <div id="leaderboard-content" class="leaderboard-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settings-modal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">
+                        <i class="bi bi-gear-fill me-2"></i>
+                        Game Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h6 class="settings-section-title">
+                            <i class="bi bi-joystick"></i> Game Features
+                        </h6>
+                        <div class="settings-group">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label" for="enable-pause">💤 Pause/Resume</label>
+                                    <small class="setting-description">Allow pausing the game (Space)</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enable-pause" checked>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label" for="enable-hint">💡 Hint System</label>
+                                    <small class="setting-description">Enable hints (Max 3 per game)</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enable-hint" checked>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label" for="enable-undo">🔁 Undo/Redo</label>
+                                    <small class="setting-description">Enable undo moves (Max 3)</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enable-undo" checked>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label" for="enable-question">❓ Question Mark</label>
+                                    <small class="setting-description">Flag → Question → Empty cycle</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enable-question" checked>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info settings-info-box" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <small>Settings akan tersimpan otomatis. Mulai game baru untuk menerapkan perubahan.</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Tutup
+                    </button>
                 </div>
             </div>
         </div>

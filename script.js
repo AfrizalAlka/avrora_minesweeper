@@ -21,6 +21,14 @@ class Minesweeper {
         this.maxUndoMoves = 3;
         this.undoUsed = false;
 
+        // Game features settings
+        this.featureSettings = {
+            pauseEnabled: this.loadSetting('pauseEnabled', true),
+            hintEnabled: this.loadSetting('hintEnabled', true),
+            undoEnabled: this.loadSetting('undoEnabled', true),
+            questionEnabled: this.loadSetting('questionEnabled', true)
+        };
+
         // Sound settings
         this.soundEnabled = this.loadSetting('soundEnabled', true);
 
@@ -373,6 +381,7 @@ class Minesweeper {
     init() {
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
+        this.setupSettingsListeners();
         this.createBoard();
 
         // Apply dark mode if enabled
@@ -484,6 +493,12 @@ class Minesweeper {
                     this.showToast('⌨️ Keyboard: Leaderboard (B)', 'info');
                     break;
 
+                case 'g':
+                    e.preventDefault();
+                    this.showSettings();
+                    this.showToast('⌨️ Keyboard: Settings (G)', 'info');
+                    break;
+
                 case '?':
                     e.preventDefault();
                     this.showKeyboardHelp();
@@ -519,6 +534,7 @@ class Minesweeper {
                         <tr><td><kbd>D</kbd></td><td>Toggle Dark Mode</td></tr>
                         <tr><td><kbd>M</kbd></td><td>Toggle Sound</td></tr>
                         <tr><td><kbd>B</kbd></td><td>Show Leaderboard</td></tr>
+                        <tr><td><kbd>G</kbd></td><td>Game Settings</td></tr>
                         <tr><td><kbd>ESC</kbd></td><td>Close Modal / Resume</td></tr>
                         <tr><td><kbd>?</kbd></td><td>Show This Help</td></tr>
                     </tbody>
@@ -555,6 +571,49 @@ class Minesweeper {
         }, { once: true });
 
         modal.addEventListener('hidden.bs.modal', handleClose);
+    }
+
+    showSettings() {
+        const modal = document.getElementById('settings-modal');
+        const bsModal = new bootstrap.Modal(modal);
+
+        // Load current settings to checkboxes
+        document.getElementById('enable-pause').checked = this.featureSettings.pauseEnabled;
+        document.getElementById('enable-hint').checked = this.featureSettings.hintEnabled;
+        document.getElementById('enable-undo').checked = this.featureSettings.undoEnabled;
+        document.getElementById('enable-question').checked = this.featureSettings.questionEnabled;
+
+        bsModal.show();
+    }
+
+    setupSettingsListeners() {
+        // Pause toggle
+        document.getElementById('enable-pause').addEventListener('change', (e) => {
+            this.featureSettings.pauseEnabled = e.target.checked;
+            this.saveSetting('pauseEnabled', e.target.checked);
+            this.showToast(`💤 Pause ${e.target.checked ? 'diaktifkan' : 'dinonaktifkan'}`, 'info');
+        });
+
+        // Hint toggle
+        document.getElementById('enable-hint').addEventListener('change', (e) => {
+            this.featureSettings.hintEnabled = e.target.checked;
+            this.saveSetting('hintEnabled', e.target.checked);
+            this.showToast(`💡 Hint ${e.target.checked ? 'diaktifkan' : 'dinonaktifkan'}`, 'info');
+        });
+
+        // Undo toggle
+        document.getElementById('enable-undo').addEventListener('change', (e) => {
+            this.featureSettings.undoEnabled = e.target.checked;
+            this.saveSetting('undoEnabled', e.target.checked);
+            this.showToast(`🔁 Undo/Redo ${e.target.checked ? 'diaktifkan' : 'dinonaktifkan'}`, 'info');
+        });
+
+        // Question mark toggle
+        document.getElementById('enable-question').addEventListener('change', (e) => {
+            this.featureSettings.questionEnabled = e.target.checked;
+            this.saveSetting('questionEnabled', e.target.checked);
+            this.showToast(`❓ Question Mark ${e.target.checked ? 'diaktifkan' : 'dinonaktifkan'}`, 'info');
+        });
     }
 
     updateDarkModeIcon() {
@@ -598,6 +657,7 @@ class Minesweeper {
         document.getElementById('hint-btn').addEventListener('click', () => this.useHint());
         document.getElementById('undo-btn').addEventListener('click', () => this.undoMove());
         document.getElementById('redo-btn').addEventListener('click', () => this.redoMove());
+        document.getElementById('settings-btn').addEventListener('click', () => this.showSettings());
 
         // Leaderboard tabs - use Bootstrap nav-link
         document.querySelectorAll('.nav-link[data-bs-toggle="pill"]').forEach(link => {
@@ -827,7 +887,9 @@ class Minesweeper {
         }
 
         // Save state before revealing (only for single cell reveals, not chord)
-        this.saveStateForUndo('reveal', { row, col });
+        if (this.featureSettings.undoEnabled) {
+            this.saveStateForUndo('reveal', { row, col });
+        }
 
         this.revealCell(row, col, true); // true = initial click, play sound
     }
@@ -959,33 +1021,55 @@ class Minesweeper {
             questioned: cell.questioned
         };
 
-        // Cycle: Empty → Flag → Question → Empty
-        if (cell.flagged) {
-            // Flag → Question
-            this.playSound('question');
-            cell.flagged = false;
-            cell.questioned = true;
-            cellElement.classList.remove('flagged');
-            cellElement.classList.add('questioned');
-            cellElement.textContent = '❓';
-            this.flagsCount--;
-        } else if (cell.questioned) {
-            // Question → Empty
-            this.playSound('click');
-            cell.questioned = false;
-            cellElement.classList.remove('questioned');
-            cellElement.textContent = '';
+        // Cycle based on question mark setting
+        if (this.featureSettings.questionEnabled) {
+            // Cycle: Empty → Flag → Question → Empty
+            if (cell.flagged) {
+                // Flag → Question
+                this.playSound('question');
+                cell.flagged = false;
+                cell.questioned = true;
+                cellElement.classList.remove('flagged');
+                cellElement.classList.add('questioned');
+                cellElement.textContent = '❓';
+                this.flagsCount--;
+            } else if (cell.questioned) {
+                // Question → Empty
+                this.playSound('click');
+                cell.questioned = false;
+                cellElement.classList.remove('questioned');
+                cellElement.textContent = '';
+            } else {
+                // Empty → Flag
+                this.playSound('flag');
+                cell.flagged = true;
+                cellElement.classList.add('flagged');
+                cellElement.textContent = '🚩';
+                this.flagsCount++;
+            }
         } else {
-            // Empty → Flag
-            this.playSound('flag');
-            cell.flagged = true;
-            cellElement.classList.add('flagged');
-            cellElement.textContent = '🚩';
-            this.flagsCount++;
+            // Simple cycle: Empty → Flag → Empty (no question mark)
+            if (cell.flagged) {
+                // Flag → Empty
+                this.playSound('click');
+                cell.flagged = false;
+                cellElement.classList.remove('flagged');
+                cellElement.textContent = '';
+                this.flagsCount--;
+            } else {
+                // Empty → Flag
+                this.playSound('flag');
+                cell.flagged = true;
+                cellElement.classList.add('flagged');
+                cellElement.textContent = '🚩';
+                this.flagsCount++;
+            }
         }
 
-        // Save state for undo
-        this.saveStateForUndo('flag', { row, col, oldState, newState: { flagged: cell.flagged, questioned: cell.questioned } });
+        // Save state for undo (if enabled)
+        if (this.featureSettings.undoEnabled) {
+            this.saveStateForUndo('flag', { row, col, oldState, newState: { flagged: cell.flagged, questioned: cell.questioned } });
+        }
 
         this.updateFlagsCount();
     }
@@ -1154,8 +1238,8 @@ class Minesweeper {
     }
 
     saveStateForUndo(action, data) {
-        // Don't save if game is over
-        if (this.gameOver) return;
+        // Don't save if game is over or undo disabled
+        if (this.gameOver || !this.featureSettings.undoEnabled) return;
 
         // Create deep copy of current board state
         const boardCopy = JSON.parse(JSON.stringify(this.board));
@@ -1183,7 +1267,7 @@ class Minesweeper {
     }
 
     undoMove() {
-        if (this.moveHistory.length === 0 || this.gameOver || this.isPaused) {
+        if (!this.featureSettings.undoEnabled || this.moveHistory.length === 0 || this.gameOver || this.isPaused) {
             return;
         }
 
@@ -1218,7 +1302,7 @@ class Minesweeper {
     }
 
     redoMove() {
-        if (this.redoStack.length === 0 || this.gameOver || this.isPaused) {
+        if (!this.featureSettings.undoEnabled || this.redoStack.length === 0 || this.gameOver || this.isPaused) {
             return;
         }
 
@@ -1421,17 +1505,24 @@ class Minesweeper {
             this.updateTimer();
         }, 1000);
 
-        // Show pause, hint, and undo/redo buttons when timer starts
+        // Show buttons based on feature settings
         const pauseBtn = document.getElementById('pause-game');
         const hintBtn = document.getElementById('hint-btn');
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');
-        pauseBtn.style.display = 'flex';
-        hintBtn.style.display = 'flex';
-        undoBtn.style.display = 'flex';
-        redoBtn.style.display = 'flex';
-        this.updateHintButton();
-        this.updateUndoRedoButtons();
+
+        if (this.featureSettings.pauseEnabled) {
+            pauseBtn.style.display = 'flex';
+        }
+        if (this.featureSettings.hintEnabled) {
+            hintBtn.style.display = 'flex';
+            this.updateHintButton();
+        }
+        if (this.featureSettings.undoEnabled) {
+            undoBtn.style.display = 'flex';
+            redoBtn.style.display = 'flex';
+            this.updateUndoRedoButtons();
+        }
     }
 
     stopTimer() {
