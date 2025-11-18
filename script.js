@@ -1102,7 +1102,7 @@ class Minesweeper {
                     <div class="result-stat-value">${this.bestScores[this.currentLevel] || '-'}</div>
                 </div>
             `;
-            
+
             this.playSound('win');
         } else {
             modalContent.classList.add('lose');
