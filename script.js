@@ -1076,18 +1076,14 @@ class Minesweeper {
             modalTitle.innerHTML = '<i class="bi bi-trophy-fill"></i> KEMENANGAN!';
             resultIcon.textContent = '🎉';
 
-            // Show different message if hints or undo were used
-            if (this.hintsUsed || this.undoUsed) {
-                const assists = [];
-                if (this.hintsUsed) assists.push('Hint');
-                if (this.undoUsed) assists.push('Undo');
-                resultMessage.textContent = `Selamat! Anda Menang! (${assists.join(' & ')} digunakan)`;
+            // Show different message if hints were used
+            if (this.hintsUsed) {
+                resultMessage.textContent = 'Selamat! Anda Menang! (Hint digunakan)';
             } else {
                 resultMessage.textContent = isNewRecord ? '🏆 REKOR BARU!' : 'Selamat! Anda Menang!';
             }
 
             const hintsUsedCount = 3 - this.hintsRemaining;
-            const undosUsedCount = this.maxUndoMoves - this.moveHistory.length;
             resultStats.innerHTML = `
                 <div class="result-stat-item">
                     <div class="result-stat-label">⏱️ Waktu</div>
@@ -1102,14 +1098,12 @@ class Minesweeper {
                     <div class="result-stat-value">${hintsUsedCount}/3</div>
                 </div>
                 <div class="result-stat-item">
-                    <div class="result-stat-label">🔁 Undos</div>
-                    <div class="result-stat-value">${undosUsedCount}/3</div>
-                </div>
-                <div class="result-stat-item">
                     <div class="result-stat-label">🏆 Best</div>
                     <div class="result-stat-value">${this.bestScores[this.currentLevel] || '-'}</div>
                 </div>
-            `; this.playSound('win');
+            `;
+            
+            this.playSound('win');
         } else {
             modalContent.classList.add('lose');
             modalTitle.innerHTML = '<i class="bi bi-x-circle-fill"></i> GAME OVER';
@@ -1147,7 +1141,7 @@ class Minesweeper {
     }
 
     pauseGame() {
-        if (!this.gameStarted || this.gameOver || this.isPaused) {
+        if (!this.featureSettings.pauseEnabled || !this.gameStarted || this.gameOver || this.isPaused) {
             return;
         }
 
