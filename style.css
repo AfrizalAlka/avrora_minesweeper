@@ -1266,6 +1266,201 @@ body.dark-mode .table {
 }
 
 /* ============================================
+   STATISTICS MODAL
+   ============================================ */
+
+.statistics-container {
+    padding: 0.5rem 0;
+}
+
+.stats-section {
+    margin-bottom: 2rem;
+}
+
+.stats-section:last-child {
+    margin-bottom: 0;
+}
+
+.stats-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.dark-mode .stats-section-title {
+    color: var(--dark-primary);
+    border-bottom-color: rgba(96, 165, 250, 0.2);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+    border: 2px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+}
+
+body.dark-mode .stat-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+body.dark-mode .stat-card:hover {
+    border-color: rgba(96, 165, 250, 0.5);
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+body.dark-mode .stat-value {
+    color: var(--dark-primary);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+body.dark-mode .stat-label {
+    color: #9ca3af;
+}
+
+.difficulty-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.difficulty-stat-item {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+    border: 2px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.difficulty-stat-item:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+}
+
+body.dark-mode .difficulty-stat-item {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+body.dark-mode .difficulty-stat-item:hover {
+    border-color: rgba(96, 165, 250, 0.5);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));
+}
+
+.difficulty-stat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+body.dark-mode .difficulty-stat-header {
+    border-bottom-color: rgba(96, 165, 250, 0.2);
+}
+
+.difficulty-icon {
+    font-size: 1.5rem;
+}
+
+.difficulty-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+body.dark-mode .difficulty-name {
+    color: var(--dark-primary);
+}
+
+.difficulty-stat-values {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.difficulty-stat-value {
+    text-align: center;
+}
+
+.difficulty-stat-value small {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+body.dark-mode .difficulty-stat-value small {
+    color: #9ca3af;
+}
+
+.difficulty-stat-value strong {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+body.dark-mode .difficulty-stat-value strong {
+    color: var(--dark-primary);
+}
+
+#show-statistics i {
+    transition: all 0.3s ease;
+}
+
+#show-statistics:hover i {
+    transform: scale(1.2) translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .difficulty-stat-values {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-icon {
+        font-size: 1.5rem;
+    }
+}
+
+/* ============================================
    SETTINGS MODAL
    ============================================ */
 
