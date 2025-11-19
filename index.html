@@ -39,6 +39,9 @@
                     <button class="btn btn-icon" id="show-leaderboard" title="Leaderboard">
                         <i class="bi bi-trophy-fill"></i>
                     </button>
+                    <button class="btn btn-icon" id="show-statistics" title="Statistics">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </button>
                     <button class="btn btn-icon" id="settings-btn" title="Settings">
                         <i class="bi bi-gear-fill"></i>
                     </button>
@@ -217,6 +220,147 @@
                         </li>
                     </ul>
                     <div id="leaderboard-content" class="leaderboard-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal fade" id="statistics-modal" tabindex="-1" aria-labelledby="statisticsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statisticsModalLabel">
+                        <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+                        Game Statistics
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="statistics-container">
+                        <!-- Overall Stats -->
+                        <div class="stats-section">
+                            <h6 class="stats-section-title">
+                                <i class="bi bi-bar-chart-fill"></i> Overall Statistics
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🎮</div>
+                                        <div class="stat-value" id="total-games">0</div>
+                                        <div class="stat-label">Total Games</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🏆</div>
+                                        <div class="stat-value" id="total-wins">0</div>
+                                        <div class="stat-label">Wins</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">💥</div>
+                                        <div class="stat-value" id="total-losses">0</div>
+                                        <div class="stat-label">Losses</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">📊</div>
+                                        <div class="stat-value" id="win-rate">0%</div>
+                                        <div class="stat-label">Win Rate</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Time Stats -->
+                        <div class="stats-section">
+                            <h6 class="stats-section-title">
+                                <i class="bi bi-clock-fill"></i> Time Statistics
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-4">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">⚡</div>
+                                        <div class="stat-value" id="fastest-win">-</div>
+                                        <div class="stat-label">Fastest Win</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">⏱️</div>
+                                        <div class="stat-value" id="average-time">-</div>
+                                        <div class="stat-label">Avg Time</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">⌛</div>
+                                        <div class="stat-value" id="total-playtime">-</div>
+                                        <div class="stat-label">Total Playtime</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Difficulty Stats -->
+                        <div class="stats-section">
+                            <h6 class="stats-section-title">
+                                <i class="bi bi-speedometer"></i> By Difficulty
+                            </h6>
+                            <div class="difficulty-stats" id="difficulty-stats"></div>
+                        </div>
+
+                        <!-- Additional Stats -->
+                        <div class="stats-section">
+                            <h6 class="stats-section-title">
+                                <i class="bi bi-star-fill"></i> Achievements
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">💡</div>
+                                        <div class="stat-value" id="hints-used">0</div>
+                                        <div class="stat-label">Hints Used</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🔥</div>
+                                        <div class="stat-value" id="win-streak">0</div>
+                                        <div class="stat-label">Win Streak</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🎯</div>
+                                        <div class="stat-value" id="perfect-games">0</div>
+                                        <div class="stat-label">Perfect Games</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">💣</div>
+                                        <div class="stat-value" id="total-mines">0</div>
+                                        <div class="stat-label">Mines Found</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-danger" id="reset-stats-btn">
+                        <i class="bi bi-trash-fill me-1"></i>
+                        Reset Statistics
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Tutup
+                    </button>
                 </div>
             </div>
         </div>

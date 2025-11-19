@@ -22,6 +22,11 @@ class Minesweeper {
             questionEnabled: this.loadSetting('questionEnabled', true)
         };
 
+        // Statistics
+        this.statistics = this.loadStatistics();
+        this.currentGameStartTime = null;
+        this.currentWinStreak = 0;
+
         // Sound settings
         this.soundEnabled = this.loadSetting('soundEnabled', true);
 
@@ -337,6 +342,192 @@ class Minesweeper {
         }).join('');
     }
 
+    loadStatistics() {
+        const saved = localStorage.getItem('minesweeper-statistics');
+        return saved ? JSON.parse(saved) : {
+            totalGames: 0,
+            totalWins: 0,
+            totalLosses: 0,
+            totalPlaytime: 0,
+            fastestWin: null,
+            totalHintsUsed: 0,
+            currentWinStreak: 0,
+            longestWinStreak: 0,
+            perfectGames: 0,
+            totalMinesFound: 0,
+            byDifficulty: {
+                easy: { games: 0, wins: 0, losses: 0, totalTime: 0 },
+                medium: { games: 0, wins: 0, losses: 0, totalTime: 0 },
+                hard: { games: 0, wins: 0, losses: 0, totalTime: 0 },
+                custom: { games: 0, wins: 0, losses: 0, totalTime: 0 }
+            }
+        };
+    }
+
+    saveStatistics() {
+        localStorage.setItem('minesweeper-statistics', JSON.stringify(this.statistics));
+    }
+
+    updateStatistics(won) {
+        // Update overall stats
+        this.statistics.totalGames++;
+        this.statistics.totalPlaytime += this.timer;
+
+        if (won) {
+            this.statistics.totalWins++;
+
+            // Update fastest win
+            if (this.statistics.fastestWin === null || this.timer < this.statistics.fastestWin) {
+                this.statistics.fastestWin = this.timer;
+            }
+
+            // Update win streak
+            this.statistics.currentWinStreak++;
+            if (this.statistics.currentWinStreak > this.statistics.longestWinStreak) {
+                this.statistics.longestWinStreak = this.statistics.currentWinStreak;
+            }
+
+            // Check if perfect game (no hints used)
+            if (!this.hintsUsed) {
+                this.statistics.perfectGames++;
+            }
+
+            // Count mines found
+            this.statistics.totalMinesFound += this.minesCount;
+        } else {
+            this.statistics.totalLosses++;
+            this.statistics.currentWinStreak = 0;
+        }
+
+        // Update hints used
+        const hintsUsedThisGame = 3 - this.hintsRemaining;
+        this.statistics.totalHintsUsed += hintsUsedThisGame;
+
+        // Update difficulty-specific stats
+        const difficulty = this.currentLevel;
+        if (this.statistics.byDifficulty[difficulty]) {
+            this.statistics.byDifficulty[difficulty].games++;
+            this.statistics.byDifficulty[difficulty].totalTime += this.timer;
+            if (won) {
+                this.statistics.byDifficulty[difficulty].wins++;
+            } else {
+                this.statistics.byDifficulty[difficulty].losses++;
+            }
+        }
+
+        this.saveStatistics();
+    }
+
+    showStatistics() {
+        const modal = document.getElementById('statistics-modal');
+        const bsModal = new bootstrap.Modal(modal);
+
+        // Update overall stats
+        document.getElementById('total-games').textContent = this.statistics.totalGames;
+        document.getElementById('total-wins').textContent = this.statistics.totalWins;
+        document.getElementById('total-losses').textContent = this.statistics.totalLosses;
+
+        const winRate = this.statistics.totalGames > 0
+            ? ((this.statistics.totalWins / this.statistics.totalGames) * 100).toFixed(1)
+            : 0;
+        document.getElementById('win-rate').textContent = winRate + '%';
+
+        // Update time stats
+        document.getElementById('fastest-win').textContent = this.statistics.fastestWin !== null
+            ? this.statistics.fastestWin + 's'
+            : '-';
+
+        const avgTime = this.statistics.totalGames > 0
+            ? Math.round(this.statistics.totalPlaytime / this.statistics.totalGames)
+            : 0;
+        document.getElementById('average-time').textContent = avgTime > 0 ? avgTime + 's' : '-';
+
+        const totalMinutes = Math.floor(this.statistics.totalPlaytime / 60);
+        const totalHours = Math.floor(totalMinutes / 60);
+        const remainingMinutes = totalMinutes % 60;
+        const playtimeText = totalHours > 0
+            ? `${totalHours}h ${remainingMinutes}m`
+            : totalMinutes > 0 ? `${totalMinutes}m` : '-';
+        document.getElementById('total-playtime').textContent = playtimeText;
+
+        // Update achievements
+        document.getElementById('hints-used').textContent = this.statistics.totalHintsUsed;
+        document.getElementById('win-streak').textContent = this.statistics.longestWinStreak;
+        document.getElementById('perfect-games').textContent = this.statistics.perfectGames;
+        document.getElementById('total-mines').textContent = this.statistics.totalMinesFound;
+
+        // Update difficulty stats
+        const difficultyStatsContainer = document.getElementById('difficulty-stats');
+        const difficulties = [
+            { key: 'easy', label: 'Easy', icon: '😊' },
+            { key: 'medium', label: 'Medium', icon: '😐' },
+            { key: 'hard', label: 'Hard', icon: '😤' },
+            { key: 'custom', label: 'Custom', icon: '⚙️' }
+        ];
+
+        difficultyStatsContainer.innerHTML = difficulties.map(diff => {
+            const stats = this.statistics.byDifficulty[diff.key];
+            const winRate = stats.games > 0 ? ((stats.wins / stats.games) * 100).toFixed(1) : 0;
+            const avgTime = stats.games > 0 ? Math.round(stats.totalTime / stats.games) : 0;
+
+            return `
+                <div class="difficulty-stat-item">
+                    <div class="difficulty-stat-header">
+                        <span class="difficulty-icon">${diff.icon}</span>
+                        <span class="difficulty-name">${diff.label}</span>
+                    </div>
+                    <div class="difficulty-stat-values">
+                        <div class="difficulty-stat-value">
+                            <small>Games:</small>
+                            <strong>${stats.games}</strong>
+                        </div>
+                        <div class="difficulty-stat-value">
+                            <small>Wins:</small>
+                            <strong>${stats.wins}</strong>
+                        </div>
+                        <div class="difficulty-stat-value">
+                            <small>Win Rate:</small>
+                            <strong>${winRate}%</strong>
+                        </div>
+                        <div class="difficulty-stat-value">
+                            <small>Avg Time:</small>
+                            <strong>${avgTime > 0 ? avgTime + 's' : '-'}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        bsModal.show();
+        this.playSound('click');
+    }
+
+    resetStatistics() {
+        if (confirm('Yakin ingin mereset semua statistik? Aksi ini tidak dapat dibatalkan!')) {
+            this.statistics = {
+                totalGames: 0,
+                totalWins: 0,
+                totalLosses: 0,
+                totalPlaytime: 0,
+                fastestWin: null,
+                totalHintsUsed: 0,
+                currentWinStreak: 0,
+                longestWinStreak: 0,
+                perfectGames: 0,
+                totalMinesFound: 0,
+                byDifficulty: {
+                    easy: { games: 0, wins: 0, losses: 0, totalTime: 0 },
+                    medium: { games: 0, wins: 0, losses: 0, totalTime: 0 },
+                    hard: { games: 0, wins: 0, losses: 0, totalTime: 0 },
+                    custom: { games: 0, wins: 0, losses: 0, totalTime: 0 }
+                }
+            };
+            this.saveStatistics();
+            this.showStatistics(); // Refresh display
+            this.showToast('✅ Statistik telah direset', 'success');
+        }
+    }
+
     loadBestScores() {
         const saved = localStorage.getItem('minesweeper-best-scores');
         return saved ? JSON.parse(saved) : {
@@ -472,6 +663,12 @@ class Minesweeper {
                     this.showToast('⌨️ Keyboard: Leaderboard (B)', 'info');
                     break;
 
+                case 't':
+                    e.preventDefault();
+                    this.showStatistics();
+                    this.showToast('⌨️ Keyboard: Statistics (T)', 'info');
+                    break;
+
                 case 'g':
                     e.preventDefault();
                     this.showSettings();
@@ -511,6 +708,7 @@ class Minesweeper {
                         <tr><td><kbd>D</kbd></td><td>Toggle Dark Mode</td></tr>
                         <tr><td><kbd>M</kbd></td><td>Toggle Sound</td></tr>
                         <tr><td><kbd>B</kbd></td><td>Show Leaderboard</td></tr>
+                        <tr><td><kbd>T</kbd></td><td>Show Statistics</td></tr>
                         <tr><td><kbd>G</kbd></td><td>Game Settings</td></tr>
                         <tr><td><kbd>ESC</kbd></td><td>Close Modal / Resume</td></tr>
                         <tr><td><kbd>?</kbd></td><td>Show This Help</td></tr>
@@ -621,6 +819,8 @@ class Minesweeper {
         document.getElementById('save-game').addEventListener('click', () => this.saveGame());
         document.getElementById('load-game').addEventListener('click', () => this.loadGame());
         document.getElementById('show-leaderboard').addEventListener('click', () => this.showLeaderboard());
+        document.getElementById('show-statistics').addEventListener('click', () => this.showStatistics());
+        document.getElementById('reset-stats-btn').addEventListener('click', () => this.resetStatistics());
         document.getElementById('pause-game').addEventListener('click', () => this.pauseGame());
         document.getElementById('resume-game').addEventListener('click', () => this.resumeGame());
         document.getElementById('hint-btn').addEventListener('click', () => this.useHint());
@@ -1039,6 +1239,9 @@ class Minesweeper {
         this.stopTimer();
         const statusMessage = document.getElementById('status-message');
 
+        // Update statistics
+        this.updateStatistics(won);
+
         if (won) {
             this.playSound('win');
             this.updateBestScore();
@@ -1281,6 +1484,7 @@ class Minesweeper {
     }
 
     startTimer() {
+        this.currentGameStartTime = Date.now();
         this.timerInterval = setInterval(() => {
             this.timer++;
             this.updateTimer();
