@@ -27,6 +27,17 @@ class Minesweeper {
         this.currentGameStartTime = null;
         this.currentWinStreak = 0;
 
+        // Replay System
+        this.replayRecording = [];
+        this.isRecording = false;
+        this.currentReplay = null;
+        this.replayPlayback = {
+            isPlaying: false,
+            currentMoveIndex: 0,
+            speed: 1,
+            interval: null
+        };
+
         // Sound settings
         this.soundEnabled = this.loadSetting('soundEnabled', true);
 
@@ -528,6 +539,322 @@ class Minesweeper {
         }
     }
 
+    // ============================================
+    // REPLAY SYSTEM
+    // ============================================
+
+    recordReplayMetadata() {
+        this.currentReplay = {
+            version: '1.0',
+            date: new Date().toISOString(),
+            difficulty: this.currentLevel,
+            rows: this.rows,
+            cols: this.cols,
+            minesCount: this.minesCount,
+            moves: [],
+            result: null,
+            finalTime: 0,
+            hintsUsed: 0
+        };
+    }
+
+    recordMove(type, row, col) {
+        if (!this.currentReplay) return;
+
+        this.currentReplay.moves.push({
+            type: type,        // 'reveal' or 'flag'
+            row: row,
+            col: col,
+            timestamp: Date.now(),
+            gameTime: this.timer
+        });
+    }
+
+    stopRecording(won) {
+        this.isRecording = false;
+
+        if (this.currentReplay) {
+            this.currentReplay.result = won ? 'win' : 'loss';
+            this.currentReplay.finalTime = this.timer;
+            this.currentReplay.hintsUsed = 3 - this.hintsRemaining;
+
+            // Replay button is now shown in the result modal
+        }
+    }
+
+    showReplayModal() {
+        if (!this.currentReplay || !this.currentReplay.moves.length) {
+            this.showToast('❌ Tidak ada replay tersedia', 'error');
+            return;
+        }
+
+        const modal = document.getElementById('replay-modal');
+        const bsModal = new bootstrap.Modal(modal);
+
+        // Update replay info
+        document.getElementById('replay-difficulty').textContent = this.currentReplay.difficulty.toUpperCase();
+        document.getElementById('replay-result').textContent = this.currentReplay.result === 'win' ? '🏆 WIN' : '💥 LOSS';
+        document.getElementById('replay-time').textContent = this.currentReplay.finalTime + 's';
+        document.getElementById('replay-moves').textContent = this.currentReplay.moves.length;
+
+        // Setup playback controls
+        this.setupReplayControls();
+
+        // Initialize replay board
+        this.initReplayBoard();
+
+        bsModal.show();
+        this.playSound('click');
+    }
+
+    setupReplayControls() {
+        const slider = document.getElementById('replay-slider');
+        const playBtn = document.getElementById('replay-play');
+        const prevBtn = document.getElementById('replay-prev');
+        const nextBtn = document.getElementById('replay-next');
+        const firstBtn = document.getElementById('replay-first');
+        const lastBtn = document.getElementById('replay-last');
+        const speedSelect = document.getElementById('replay-speed-select');
+        const exportBtn = document.getElementById('export-replay-btn');
+        const importBtn = document.getElementById('import-replay-btn');
+        const fileInput = document.getElementById('replay-file-input');
+
+        const totalMoves = this.currentReplay.moves.length;
+        slider.max = totalMoves;
+        slider.value = 0;
+        slider.disabled = false;
+        document.getElementById('total-moves').textContent = totalMoves;
+        document.getElementById('current-move').textContent = 0;
+
+        // Enable buttons
+        playBtn.disabled = false;
+        prevBtn.disabled = false;
+        nextBtn.disabled = false;
+        firstBtn.disabled = false;
+        lastBtn.disabled = false;
+
+        // Remove old event listeners by cloning
+        const newPlayBtn = playBtn.cloneNode(true);
+        playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+        const newPrevBtn = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+        const newNextBtn = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+        const newFirstBtn = firstBtn.cloneNode(true);
+        firstBtn.parentNode.replaceChild(newFirstBtn, firstBtn);
+        const newLastBtn = lastBtn.cloneNode(true);
+        lastBtn.parentNode.replaceChild(newLastBtn, lastBtn);
+        const newSlider = slider.cloneNode(true);
+        slider.parentNode.replaceChild(newSlider, slider);
+
+        // Play/Pause
+        newPlayBtn.addEventListener('click', () => this.toggleReplayPlayback());
+
+        // Previous
+        newPrevBtn.addEventListener('click', () => {
+            this.stopReplayPlayback();
+            if (this.replayPlayback.currentMoveIndex > 0) {
+                this.replayPlayback.currentMoveIndex--;
+                this.renderReplayMove(this.replayPlayback.currentMoveIndex);
+            }
+        });
+
+        // Next
+        newNextBtn.addEventListener('click', () => {
+            this.stopReplayPlayback();
+            if (this.replayPlayback.currentMoveIndex < totalMoves) {
+                this.replayPlayback.currentMoveIndex++;
+                this.renderReplayMove(this.replayPlayback.currentMoveIndex);
+            }
+        });
+
+        // First
+        newFirstBtn.addEventListener('click', () => {
+            this.stopReplayPlayback();
+            this.replayPlayback.currentMoveIndex = 0;
+            this.renderReplayMove(0);
+        });
+
+        // Last
+        newLastBtn.addEventListener('click', () => {
+            this.stopReplayPlayback();
+            this.replayPlayback.currentMoveIndex = totalMoves;
+            this.renderReplayMove(totalMoves);
+        });
+
+        // Slider
+        newSlider.addEventListener('input', (e) => {
+            this.stopReplayPlayback();
+            this.replayPlayback.currentMoveIndex = parseInt(e.target.value);
+            this.renderReplayMove(this.replayPlayback.currentMoveIndex);
+        });
+
+        // Speed
+        speedSelect.addEventListener('change', (e) => {
+            this.replayPlayback.speed = parseFloat(e.target.value);
+        });
+
+        // Export
+        exportBtn.addEventListener('click', () => this.exportReplay());
+
+        // Import
+        importBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => this.importReplay(e));
+
+        // Reset playback state
+        this.replayPlayback.currentMoveIndex = 0;
+        this.replayPlayback.isPlaying = false;
+    }
+
+    initReplayBoard() {
+        const container = document.getElementById('replay-board');
+        container.innerHTML = '';
+        container.className = 'replay-board-grid';
+
+        // Adjust grid size
+        const cellSize = Math.min(30, 400 / Math.max(this.currentReplay.rows, this.currentReplay.cols));
+        container.style.gridTemplateColumns = `repeat(${this.currentReplay.cols}, ${cellSize}px)`;
+
+        // Create empty board
+        for (let i = 0; i < this.currentReplay.rows; i++) {
+            for (let j = 0; j < this.currentReplay.cols; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'replay-cell';
+                cell.dataset.row = i;
+                cell.dataset.col = j;
+                cell.style.width = cellSize + 'px';
+                cell.style.height = cellSize + 'px';
+                container.appendChild(cell);
+            }
+        }
+    }
+
+    renderReplayMove(moveIndex) {
+        // Reset board
+        const cells = document.querySelectorAll('.replay-cell');
+        cells.forEach(cell => {
+            cell.className = 'replay-cell';
+            cell.textContent = '';
+        });
+
+        // Render all moves up to current index
+        for (let i = 0; i < moveIndex && i < this.currentReplay.moves.length; i++) {
+            const move = this.currentReplay.moves[i];
+            const cell = document.querySelector(`.replay-cell[data-row="${move.row}"][data-col="${move.col}"]`);
+
+            if (move.type === 'reveal') {
+                cell.classList.add('replay-revealed');
+                // Don't show actual mine info in replay
+                cell.textContent = '✓';
+            } else if (move.type === 'flag') {
+                if (cell.classList.contains('replay-flagged')) {
+                    cell.classList.remove('replay-flagged');
+                    cell.textContent = '';
+                } else {
+                    cell.classList.add('replay-flagged');
+                    cell.textContent = '🚩';
+                }
+            }
+        }
+
+        // Update UI
+        document.getElementById('replay-slider').value = moveIndex;
+        document.getElementById('current-move').textContent = moveIndex;
+    }
+
+    toggleReplayPlayback() {
+        if (this.replayPlayback.isPlaying) {
+            this.stopReplayPlayback();
+        } else {
+            this.startReplayPlayback();
+        }
+    }
+
+    startReplayPlayback() {
+        this.replayPlayback.isPlaying = true;
+        const playBtn = document.getElementById('replay-play');
+        playBtn.innerHTML = '<i class=\"bi bi-pause-fill\"></i>';
+
+        const baseSpeed = 500; // ms between moves
+        const interval = baseSpeed / this.replayPlayback.speed;
+
+        this.replayPlayback.interval = setInterval(() => {
+            if (this.replayPlayback.currentMoveIndex >= this.currentReplay.moves.length) {
+                this.stopReplayPlayback();
+                return;
+            }
+
+            this.replayPlayback.currentMoveIndex++;
+            this.renderReplayMove(this.replayPlayback.currentMoveIndex);
+        }, interval);
+    }
+
+    stopReplayPlayback() {
+        this.replayPlayback.isPlaying = false;
+        const playBtn = document.getElementById('replay-play');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class=\"bi bi-play-fill\"></i>';
+        }
+
+        if (this.replayPlayback.interval) {
+            clearInterval(this.replayPlayback.interval);
+            this.replayPlayback.interval = null;
+        }
+    }
+
+    exportReplay() {
+        if (!this.currentReplay) {
+            this.showToast('❌ Tidak ada replay untuk di-export', 'error');
+            return;
+        }
+
+        const replayData = JSON.stringify(this.currentReplay, null, 2);
+        const blob = new Blob([replayData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `minesweeper-replay-${this.currentReplay.difficulty}-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.showToast('✅ Replay berhasil di-export!', 'success');
+    }
+
+    importReplay(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const replayData = JSON.parse(e.target.result);
+
+                // Validate replay data
+                if (!replayData.version || !replayData.moves || !Array.isArray(replayData.moves)) {
+                    throw new Error('Invalid replay format');
+                }
+
+                this.currentReplay = replayData;
+                this.showToast('✅ Replay berhasil di-import!', 'success');
+
+                // Close and reopen modal to refresh
+                const modal = bootstrap.Modal.getInstance(document.getElementById('replay-modal'));
+                if (modal) modal.hide();
+
+                setTimeout(() => this.showReplayModal(), 300);
+            } catch (error) {
+                this.showToast('❌ File replay tidak valid!', 'error');
+                console.error('Import replay error:', error);
+            }
+        };
+
+        reader.readAsText(file);
+        event.target.value = ''; // Reset input
+    }
+
     loadBestScores() {
         const saved = localStorage.getItem('minesweeper-best-scores');
         return saved ? JSON.parse(saved) : {
@@ -669,6 +996,14 @@ class Minesweeper {
                     this.showToast('⌨️ Keyboard: Statistics (T)', 'info');
                     break;
 
+                case 'v':
+                    e.preventDefault();
+                    if (this.currentReplay && this.currentReplay.moves.length > 0) {
+                        this.showReplayModal();
+                        this.showToast('⌨️ Keyboard: View Replay (V)', 'info');
+                    }
+                    break;
+
                 case 'g':
                     e.preventDefault();
                     this.showSettings();
@@ -709,6 +1044,7 @@ class Minesweeper {
                         <tr><td><kbd>M</kbd></td><td>Toggle Sound</td></tr>
                         <tr><td><kbd>B</kbd></td><td>Show Leaderboard</td></tr>
                         <tr><td><kbd>T</kbd></td><td>Show Statistics</td></tr>
+                        <tr><td><kbd>V</kbd></td><td>View Replay</td></tr>
                         <tr><td><kbd>G</kbd></td><td>Game Settings</td></tr>
                         <tr><td><kbd>ESC</kbd></td><td>Close Modal / Resume</td></tr>
                         <tr><td><kbd>?</kbd></td><td>Show This Help</td></tr>
@@ -813,6 +1149,12 @@ class Minesweeper {
             this.resetGame();
         });
 
+        document.getElementById('view-replay-btn').addEventListener('click', () => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('result-modal'));
+            if (modal) modal.hide();
+            this.showReplayModal();
+        });
+
         // Header controls
         document.getElementById('dark-mode-toggle').addEventListener('click', () => this.toggleDarkMode());
         document.getElementById('sound-toggle').addEventListener('click', () => this.toggleSound());
@@ -821,6 +1163,7 @@ class Minesweeper {
         document.getElementById('show-leaderboard').addEventListener('click', () => this.showLeaderboard());
         document.getElementById('show-statistics').addEventListener('click', () => this.showStatistics());
         document.getElementById('reset-stats-btn').addEventListener('click', () => this.resetStatistics());
+        document.getElementById('show-replay').addEventListener('click', () => this.showReplayModal());
         document.getElementById('pause-game').addEventListener('click', () => this.pauseGame());
         document.getElementById('resume-game').addEventListener('click', () => this.resumeGame());
         document.getElementById('hint-btn').addEventListener('click', () => this.useHint());
@@ -1053,6 +1396,11 @@ class Minesweeper {
             this.startTimer();
         }
 
+        // Record move for replay
+        if (this.isRecording) {
+            this.recordMove('reveal', row, col);
+        }
+
         this.revealCell(row, col, true); // true = initial click, play sound
     }
 
@@ -1222,6 +1570,11 @@ class Minesweeper {
             }
         }
 
+        // Record move for replay
+        if (this.isRecording) {
+            this.recordMove('flag', row, col);
+        }
+
         this.updateFlagsCount();
     }
 
@@ -1238,6 +1591,11 @@ class Minesweeper {
     endGame(won) {
         this.stopTimer();
         const statusMessage = document.getElementById('status-message');
+
+        // Stop recording and save replay
+        if (this.isRecording) {
+            this.stopRecording(won);
+        }
 
         // Update statistics
         this.updateStatistics(won);
@@ -1270,9 +1628,17 @@ class Minesweeper {
         const resultIcon = document.getElementById('result-icon');
         const resultMessage = document.getElementById('result-message');
         const resultStats = document.getElementById('result-stats');
+        const viewReplayBtn = document.getElementById('view-replay-btn');
 
         // Clear previous classes
         modalContent.classList.remove('win', 'lose');
+
+        // Show/hide replay button based on replay availability
+        if (this.currentReplay) {
+            viewReplayBtn.style.display = 'inline-block';
+        } else {
+            viewReplayBtn.style.display = 'none';
+        }
 
         if (isWin) {
             modalContent.classList.add('win');
@@ -1485,6 +1851,10 @@ class Minesweeper {
 
     startTimer() {
         this.currentGameStartTime = Date.now();
+        this.isRecording = true;
+        this.replayRecording = [];
+        this.recordReplayMetadata();
+
         this.timerInterval = setInterval(() => {
             this.timer++;
             this.updateTimer();
@@ -1545,6 +1915,11 @@ class Minesweeper {
         this.isPaused = false;
         this.hintsRemaining = 3;
         this.hintsUsed = false;
+        this.isRecording = false;
+        this.replayRecording = [];
+
+        // Hide replay button
+        document.getElementById('show-replay').style.display = 'none';
 
         // Hide pause overlay if visible
         const overlay = document.getElementById('pause-overlay');

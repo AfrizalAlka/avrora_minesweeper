@@ -1266,6 +1266,209 @@ body.dark-mode .table {
 }
 
 /* ============================================
+   REPLAY SYSTEM
+   ============================================ */
+
+.replay-info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+    border: 2px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+body.dark-mode .replay-info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+.replay-info-item {
+    text-align: center;
+}
+
+.replay-info-item small {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+body.dark-mode .replay-info-item small {
+    color: #9ca3af;
+}
+
+.replay-info-item strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+body.dark-mode .replay-info-item strong {
+    color: var(--dark-primary);
+}
+
+.replay-controls {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03), rgba(147, 51, 234, 0.03));
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+body.dark-mode .replay-controls {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(147, 51, 234, 0.08));
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+.replay-progress-info {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+body.dark-mode .replay-progress-info {
+    color: #9ca3af;
+}
+
+.replay-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.replay-speed {
+    display: flex;
+    align-items: center;
+}
+
+.replay-board-container {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03), rgba(147, 51, 234, 0.03));
+    border: 2px solid rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+body.dark-mode .replay-board-container {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(147, 51, 234, 0.08));
+    border-color: rgba(96, 165, 250, 0.2);
+}
+
+.replay-board-grid {
+    display: grid;
+    gap: 2px;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px;
+    border-radius: 8px;
+}
+
+body.dark-mode .replay-board-grid {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.replay-cell {
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+body.dark-mode .replay-cell {
+    background: linear-gradient(135deg, #2d3748, #1a202c);
+    border-color: #4a5568;
+}
+
+.replay-cell.replay-revealed {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-color: #3b82f6;
+    color: #1e40af;
+}
+
+body.dark-mode .replay-cell.replay-revealed {
+    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    border-color: #3b82f6;
+    color: #93c5fd;
+}
+
+.replay-cell.replay-flagged {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: #f59e0b;
+}
+
+body.dark-mode .replay-cell.replay-flagged {
+    background: linear-gradient(135deg, #78350f, #92400e);
+    border-color: #f59e0b;
+}
+
+#show-replay {
+    animation: replayPulse 2s ease-in-out infinite;
+}
+
+@keyframes replayPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+#show-replay:hover {
+    animation: none;
+    transform: scale(1.2);
+}
+
+.form-range::-webkit-slider-thumb {
+    background: var(--primary-color);
+}
+
+.form-range::-moz-range-thumb {
+    background: var(--primary-color);
+}
+
+body.dark-mode .form-range::-webkit-slider-thumb {
+    background: var(--dark-primary);
+}
+
+body.dark-mode .form-range::-moz-range-thumb {
+    background: var(--dark-primary);
+}
+
+@media (max-width: 768px) {
+    .replay-buttons {
+        gap: 0.25rem;
+    }
+
+    .replay-speed {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+
+    .replay-board-container {
+        padding: 1rem;
+        min-height: 250px;
+    }
+}
+
+/* ============================================
    STATISTICS MODAL
    ============================================ */
 
