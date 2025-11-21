@@ -42,6 +42,9 @@
                     <button class="btn btn-icon" id="show-statistics" title="Statistics">
                         <i class="bi bi-graph-up-arrow"></i>
                     </button>
+                    <button class="btn btn-icon" id="show-replay" title="Replay" style="display: none;">
+                        <i class="bi bi-play-circle-fill"></i>
+                    </button>
                     <button class="btn btn-icon" id="settings-btn" title="Settings">
                         <i class="bi bi-gear-fill"></i>
                     </button>
@@ -188,6 +191,9 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-info" id="view-replay-btn" style="display: none;">
+                        <i class="bi bi-play-circle-fill"></i> Lihat Replay
+                    </button>
                     <button type="button" class="btn btn-primary" id="play-again-btn">Main Lagi</button>
                 </div>
             </div>
@@ -365,6 +371,111 @@
             </div>
         </div>
     </div>
+
+    <!-- Replay Modal -->
+    <div class="modal fade" id="replay-modal" tabindex="-1" aria-labelledby="replayModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="replayModalLabel">
+                        <i class="bi bi-play-circle-fill text-primary me-2"></i>
+                        Game Replay
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="replay-info mb-3">
+                        <div class="row g-2">
+                            <div class="col-6 col-md-3">
+                                <div class="replay-info-item">
+                                    <small>Difficulty:</small>
+                                    <strong id="replay-difficulty">-</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="replay-info-item">
+                                    <small>Result:</small>
+                                    <strong id="replay-result">-</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="replay-info-item">
+                                    <small>Time:</small>
+                                    <strong id="replay-time">-</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="replay-info-item">
+                                    <small>Moves:</small>
+                                    <strong id="replay-moves">-</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Playback Controls -->
+                    <div class="replay-controls">
+                        <div class="replay-progress mb-3">
+                            <input type="range" class="form-range" id="replay-slider" min="0" max="100" value="0"
+                                disabled>
+                            <div class="replay-progress-info">
+                                <span>Move <span id="current-move">0</span> of <span id="total-moves">0</span></span>
+                            </div>
+                        </div>
+                        <div class="replay-buttons">
+                            <button class="btn btn-sm btn-outline-primary" id="replay-first" disabled>
+                                <i class="bi bi-skip-start-fill"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="replay-prev" disabled>
+                                <i class="bi bi-skip-backward-fill"></i>
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="replay-play" disabled>
+                                <i class="bi bi-play-fill"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="replay-next" disabled>
+                                <i class="bi bi-skip-forward-fill"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="replay-last" disabled>
+                                <i class="bi bi-skip-end-fill"></i>
+                            </button>
+                            <div class="replay-speed ms-3">
+                                <label for="replay-speed-select"
+                                    class="form-label mb-0 me-2"><small>Speed:</small></label>
+                                <select class="form-select form-select-sm" id="replay-speed-select"
+                                    style="width: auto; display: inline-block;">
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1" selected>1x</option>
+                                    <option value="1.5">1.5x</option>
+                                    <option value="2">2x</option>
+                                    <option value="3">3x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Board Preview -->
+                    <div class="replay-board-container mt-3">
+                        <div id="replay-board"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-success" id="export-replay-btn">
+                        <i class="bi bi-download me-1"></i>
+                        Export Replay
+                    </button>
+                    <button type="button" class="btn btn-primary" id="import-replay-btn">
+                        <i class="bi bi-upload me-1"></i>
+                        Import Replay
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="replay-file-input" accept=".json" style="display: none;">
 
     <!-- Settings Modal -->
     <div class="modal fade" id="settings-modal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
