@@ -544,6 +544,18 @@ class Minesweeper {
     // ============================================
 
     recordReplayMetadata() {
+        // Create a copy of board data for replay
+        const boardData = [];
+        for (let i = 0; i < this.rows; i++) {
+            boardData[i] = [];
+            for (let j = 0; j < this.cols; j++) {
+                boardData[i][j] = {
+                    mine: this.board[i][j].mine,
+                    adjacentMines: this.board[i][j].adjacentMines
+                };
+            }
+        }
+
         this.currentReplay = {
             version: '1.0',
             date: new Date().toISOString(),
@@ -551,6 +563,7 @@ class Minesweeper {
             rows: this.rows,
             cols: this.cols,
             minesCount: this.minesCount,
+            boardData: boardData,
             moves: [],
             result: null,
             finalTime: 0,
@@ -737,25 +750,47 @@ class Minesweeper {
             cell.textContent = '';
         });
 
+        // Track revealed and flagged cells
+        const revealedCells = new Set();
+        const flaggedCells = new Set();
+
         // Render all moves up to current index
         for (let i = 0; i < moveIndex && i < this.currentReplay.moves.length; i++) {
             const move = this.currentReplay.moves[i];
-            const cell = document.querySelector(`.replay-cell[data-row="${move.row}"][data-col="${move.col}"]`);
+            const cellKey = `${move.row}-${move.col}`;
 
             if (move.type === 'reveal') {
-                cell.classList.add('replay-revealed');
-                // Don't show actual mine info in replay
-                cell.textContent = '✓';
+                revealedCells.add(cellKey);
             } else if (move.type === 'flag') {
-                if (cell.classList.contains('replay-flagged')) {
-                    cell.classList.remove('replay-flagged');
-                    cell.textContent = '';
+                if (flaggedCells.has(cellKey)) {
+                    flaggedCells.delete(cellKey);
                 } else {
-                    cell.classList.add('replay-flagged');
-                    cell.textContent = '🚩';
+                    flaggedCells.add(cellKey);
                 }
             }
         }
+
+        // Apply visual states
+        cells.forEach(cell => {
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            const cellKey = `${row}-${col}`;
+            const boardCell = this.currentReplay.boardData[row][col];
+
+            if (revealedCells.has(cellKey)) {
+                cell.classList.add('revealed');
+                if (boardCell.mine) {
+                    cell.classList.add('mine');
+                    cell.textContent = '💣';
+                } else if (boardCell.adjacentMines > 0) {
+                    cell.textContent = boardCell.adjacentMines;
+                    cell.classList.add(`number-${boardCell.adjacentMines}`);
+                }
+            } else if (flaggedCells.has(cellKey)) {
+                cell.classList.add('flagged');
+                cell.textContent = '🚩';
+            }
+        });
 
         // Update UI
         document.getElementById('replay-slider').value = moveIndex;
