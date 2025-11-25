@@ -601,6 +601,12 @@ class Minesweeper {
             return;
         }
 
+        // Check if replay has board data (new format)
+        if (!this.currentReplay.boardData) {
+            this.showToast('❌ Replay ini dibuat dengan versi lama. Silakan mainkan game baru.', 'error');
+            return;
+        }
+
         const modal = document.getElementById('replay-modal');
         const bsModal = new bootstrap.Modal(modal);
 
@@ -872,6 +878,11 @@ class Minesweeper {
                     throw new Error('Invalid replay format');
                 }
 
+                // Check if replay has board data (new format required)
+                if (!replayData.boardData) {
+                    throw new Error('Replay format lama tidak didukung');
+                }
+
                 this.currentReplay = replayData;
                 this.showToast('✅ Replay berhasil di-import!', 'success');
 
@@ -881,7 +892,7 @@ class Minesweeper {
 
                 setTimeout(() => this.showReplayModal(), 300);
             } catch (error) {
-                this.showToast('❌ File replay tidak valid!', 'error');
+                this.showToast('❌ File replay tidak valid! ' + error.message, 'error');
                 console.error('Import replay error:', error);
             }
         };
@@ -1431,11 +1442,6 @@ class Minesweeper {
             this.startTimer();
         }
 
-        // Record move for replay
-        if (this.isRecording) {
-            this.recordMove('reveal', row, col);
-        }
-
         this.revealCell(row, col, true); // true = initial click, play sound
     }
 
@@ -1520,6 +1526,11 @@ class Minesweeper {
 
         cell.revealed = true;
         this.revealedCount++;
+
+        // Record this reveal in replay (including recursive reveals)
+        if (this.isRecording && this.currentReplay) {
+            this.recordMove('reveal', row, col);
+        }
 
         const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
         cellElement.classList.add('revealed');
