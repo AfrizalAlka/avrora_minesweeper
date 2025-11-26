@@ -31,6 +31,7 @@ class Minesweeper {
         this.replayRecording = [];
         this.isRecording = false;
         this.currentReplay = null;
+        this.currentBatch = null; // Track current batch of reveals
         this.replayPlayback = {
             isPlaying: false,
             currentMoveIndex: 0,
@@ -571,16 +572,33 @@ class Minesweeper {
         };
     }
 
-    recordMove(type, row, col) {
+    recordMove(type, row, col, isBatchStart = false) {
         if (!this.currentReplay) return;
 
-        this.currentReplay.moves.push({
-            type: type,        // 'reveal' or 'flag'
-            row: row,
-            col: col,
-            timestamp: Date.now(),
-            gameTime: this.timer
-        });
+        const timestamp = Date.now();
+        const gameTime = this.timer;
+
+        // If this is a batch start (user click) or a flag, create new batch
+        if (isBatchStart || type === 'flag') {
+            this.currentBatch = {
+                type: type,
+                cells: [{ row, col }],
+                timestamp: timestamp,
+                gameTime: gameTime
+            };
+            this.currentReplay.moves.push(this.currentBatch);
+        } else if (this.currentBatch && this.currentBatch.type === type) {
+            // Add to current batch (recursive reveals)
+            this.currentBatch.cells.push({ row, col });
+        } else {
+            // Fallback: create single-cell move
+            this.currentReplay.moves.push({
+                type: type,
+                cells: [{ row, col }],
+                timestamp: timestamp,
+                gameTime: gameTime
+            });
+        }
     }
 
     stopRecording(won) {
@@ -763,17 +781,23 @@ class Minesweeper {
         // Render all moves up to current index
         for (let i = 0; i < moveIndex && i < this.currentReplay.moves.length; i++) {
             const move = this.currentReplay.moves[i];
-            const cellKey = `${move.row}-${move.col}`;
 
-            if (move.type === 'reveal') {
-                revealedCells.add(cellKey);
-            } else if (move.type === 'flag') {
-                if (flaggedCells.has(cellKey)) {
-                    flaggedCells.delete(cellKey);
-                } else {
-                    flaggedCells.add(cellKey);
+            // Handle batched moves (new format) or single moves (old format)
+            const cells = move.cells || [{ row: move.row, col: move.col }];
+
+            cells.forEach(cellData => {
+                const cellKey = `${cellData.row}-${cellData.col}`;
+
+                if (move.type === 'reveal') {
+                    revealedCells.add(cellKey);
+                } else if (move.type === 'flag') {
+                    if (flaggedCells.has(cellKey)) {
+                        flaggedCells.delete(cellKey);
+                    } else {
+                        flaggedCells.add(cellKey);
+                    }
                 }
-            }
+            });
         }
 
         // Apply visual states
@@ -1442,7 +1466,12 @@ class Minesweeper {
             this.startTimer();
         }
 
-        this.revealCell(row, col, true); // true = initial click, play sound
+        // Mark this as batch start for replay
+        if (this.isRecording) {
+            this.currentBatch = null; // Reset batch before revealing
+        }
+
+        this.revealCell(row, col, true, true); // true = play sound, true = batch start
     }
 
     countAdjacentFlags(row, col) {
@@ -1514,7 +1543,7 @@ class Minesweeper {
         }
     }
 
-    revealCell(row, col, playSound = false) {
+    revealCell(row, col, playSound = false, isBatchStart = false) {
         if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
             return;
         }
@@ -1529,7 +1558,7 @@ class Minesweeper {
 
         // Record this reveal in replay (including recursive reveals)
         if (this.isRecording && this.currentReplay) {
-            this.recordMove('reveal', row, col);
+            this.recordMove('reveal', row, col, isBatchStart);
         }
 
         const cellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
@@ -1618,7 +1647,7 @@ class Minesweeper {
 
         // Record move for replay
         if (this.isRecording) {
-            this.recordMove('flag', row, col);
+            this.recordMove('flag', row, col, true); // true = batch start for flags
         }
 
         this.updateFlagsCount();
