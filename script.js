@@ -1501,6 +1501,11 @@ class Minesweeper {
         if (flagCount === cell.adjacentMines) {
             this.playSound('click');
 
+            // Reset batch for chord reveal
+            if (this.isRecording) {
+                this.currentBatch = null;
+            }
+
             // Add highlight animation to the clicked cell
             const clickedCellElement = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
             clickedCellElement.classList.add('chord-highlight');
@@ -1528,11 +1533,13 @@ class Minesweeper {
 
             // Reveal cells with staggered animation
             cellsToReveal.forEach((cellPos, index) => {
+                const isBatchStart = index === 0; // First cell starts the batch
+
                 setTimeout(() => {
                     const cellElement = document.querySelector(`[data-row="${cellPos.row}"][data-col="${cellPos.col}"]`);
                     cellElement.classList.add('chord-reveal');
 
-                    this.revealCell(cellPos.row, cellPos.col, false);
+                    this.revealCell(cellPos.row, cellPos.col, false, isBatchStart);
 
                     // Remove animation class after animation completes
                     setTimeout(() => {
